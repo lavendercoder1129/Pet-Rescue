@@ -166,7 +166,46 @@ npm run build
 - [x] **Module 8: Expense Proof Upload & Admin Verification** (Completed)
 - [x] **Module 9: Rescue Updates & Emergency Announcements** (Completed)
 - [x] **Module 10: Donor Recognition, Leaderboards & Achievement Badges** (Completed)
-- [ ] **Module 11: Role-Based Dashboard Integration & Final UI Polish** (Next)
+- [x] **Module 11: Role-Based Dashboard Integration & Final UI Polish** (Completed)
+- [ ] **Module 12: Final Testing, Deployment & Documentation** (Next)
+
+---
+
+## 📊 Module 11: Role-Based Dashboard Integration & Final UI Polish
+
+### Features
+1. **Donor Dashboard (`/donor/dashboard`)**:
+   - Personalized welcome banner and donor profile summary.
+   - Aggregate simulated gifts counter, badges earned tally, cases supported metric, and honor roll status.
+   - Real-time progress bar for the next achievable badge milestone.
+   - Spotlight grid of earned achievement badges with direct links to the full collection.
+   - Donation history table with transaction references, dates, and amounts.
+   - Recently supported rescue cases cards with quick navigation to live case timelines.
+   - In-app notification center with inline "Mark as read" interaction.
+   - Inline privacy preference controls (leaderboard participation, display alias, and total contribution visibility).
+2. **Rescuer Dashboard (`/rescuer/dashboard`)**:
+   - Verification status badge and security warning banners (Approved vs. Pending Review).
+   - Case triage metrics: Total cases, Approved, Pending review, Rejected, and Active campaigns.
+   - Quick Action hub: Report Rescue Case, Publish Clinical Update, and Submit Expense Proof.
+   - Rescuer submitted cases queue with direct links to case detail pages.
+   - Clinical updates journal tracking published milestones.
+   - Expense claim tracking table showing verification states against allocated campaign funds.
+   - Dedicated administrative review feedback feed displaying reviewer notes on cases and expenses.
+3. **Admin Control Center (`/admin/dashboard`)**:
+   - Comprehensive high-level overview metrics aggregating total users, cases, simulated donations, allocated funds, and approved expenses.
+   - Three management hubs: Case Verification Queue, Rescuer Verification Queue, and Financial Oversight (Allocations & Expense Claims).
+   - Content Governance Hub linking clinical updates moderation, emergency announcements, and badge definitions.
+   - Full user management table with role filtering (`All`, `Donors`, `Rescuers`, `Pending Verification`), real-time search by name/email, and direct rescuer verification approval/rejection actions.
+4. **Navigation & Application Integration**:
+   - Responsive `DashboardSidebar` for role-specific portals with active navigation indicators and badge counters.
+   - Dynamic `Breadcrumbs` across dashboard views for intuitive hierarchical navigation.
+   - Reusable `ProfileDropdown` in the navbar with role badges, direct dashboard shortcuts, and clean session logout.
+   - Strict role protection ensuring users cannot access other roles' dashboards or private records.
+
+### Running Module 11 Tests
+```bash
+node server/scripts/testModule11.js
+```
 
 ---
 

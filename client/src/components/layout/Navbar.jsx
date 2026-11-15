@@ -12,6 +12,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import Container from './Container';
 import NotificationDropdown from '../feedback/NotificationDropdown';
+import ProfileDropdown from './ProfileDropdown';
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -98,34 +99,8 @@ export const Navbar = () => {
                 {/* In-app Notification Bell */}
                 <NotificationDropdown />
 
-                {/* User badge with role */}
-                <Link
-                  to={getDashboardPath()}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-ivory-warm border border-grey-light hover:border-forest/40 transition-colors"
-                  title="Open Dashboard"
-                >
-                  <div className="w-6 h-6 rounded-full bg-forest text-ivory flex items-center justify-center text-[11px] font-serif font-bold">
-                    {user?.name?.charAt(0) || 'U'}
-                  </div>
-                  <div className="text-left">
-                    <span className="text-xs font-semibold text-charcoal block leading-none">
-                      {user?.name?.split(' ')[0]}
-                    </span>
-                    <span className="text-[10px] text-forest font-medium uppercase tracking-wider block mt-0.5">
-                      {user?.role}
-                    </span>
-                  </div>
-                  <LayoutDashboard className="w-3.5 h-3.5 text-sage-dark ml-1" />
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="p-2 text-charcoal-muted hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
-                  title="Log Out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
+                {/* Reusable Profile Dropdown */}
+                <ProfileDropdown />
               </div>
             ) : (
               <div className="flex items-center space-x-2">

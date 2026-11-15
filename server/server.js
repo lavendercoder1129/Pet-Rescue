@@ -2,9 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
 import apiRoutes from './routes/api.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +30,9 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded case images statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Routes
 app.use('/api', apiRoutes);
@@ -47,6 +55,7 @@ if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`[Pet Rescue Server] Running on http://localhost:${PORT}`);
     console.log(`[Health Check] http://localhost:${PORT}/api/health`);
+    console.log(`[Static Uploads] http://localhost:${PORT}/uploads`);
   });
 }
 

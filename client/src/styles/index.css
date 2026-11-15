@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  
+  body {
+    background-color: #FAF8F2;
+    color: #252A27;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+@layer components {
+  /* Apple-inspired fluid interactive button base */
+  .btn-base {
+    @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-primary {
+    @apply btn-base bg-forest text-ivory hover:bg-forest-light px-5 py-2.5 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply btn-base bg-ivory text-charcoal border border-ivory-border hover:bg-ivory-warm px-5 py-2.5;
+  }
+
+  .btn-accent {
+    @apply btn-base bg-orange-muted text-white hover:bg-orange-hover px-5 py-2.5 shadow-sm;
+  }
+  
+  .card-editorial {
+    @apply bg-white border border-ivory-border rounded-xl shadow-warm p-6 transition-all duration-200 hover:shadow-warm-lg;
+  }
+}

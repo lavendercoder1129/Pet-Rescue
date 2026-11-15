@@ -1,0 +1,20 @@
+{
+  "name": "pet-rescue",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pet Rescue - Emergency coordination platform for injured stray animal rescues and donor funding",
+  "scripts": {
+    "dev": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build": "npm run build --prefix client",
+    "lint": "npm run lint --prefix client"
+  },
+  "keywords": [
+    "pet-rescue",
+    "animal-rescue",
+    "stray-animals",
+    "emergency-rescue"
+  ],
+  "author": "Pet Rescue Project",
+  "license": "MIT"
+}

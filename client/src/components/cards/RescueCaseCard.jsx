@@ -24,7 +24,7 @@ export const RescueCaseCard = ({
   className = '',
 }) => {
   const [imgSrc, setImgSrc] = useState(image);
-  const percentage = Math.round((currentAmount / (targetAmount || 1)) * 100);
+  const percentage = Math.min(100, Math.round((currentAmount / (targetAmount || 1)) * 100));
   const detailUrl = caseUrl || (id ? `/cases/${id}` : '/cases');
 
   const handleImageError = () => {
@@ -92,7 +92,7 @@ export const RescueCaseCard = ({
               <span className="font-serif text-lg font-bold text-forest">
                 ₹{currentAmount.toLocaleString()}
               </span>
-              <span className="text-charcoal-muted ml-1">raised of ₹{targetAmount.toLocaleString()}</span>
+              <span className="text-charcoal-muted ml-1">simulated raised of ₹{targetAmount.toLocaleString()}</span>
             </div>
             <span className="font-semibold text-forest">{percentage}%</span>
           </div>

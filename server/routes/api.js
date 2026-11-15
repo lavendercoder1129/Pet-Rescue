@@ -4,6 +4,7 @@ import authRoutes from './authRoutes.js';
 import adminRoutes from './adminRoutes.js';
 import caseRoutes from './caseRoutes.js';
 import notificationRoutes from './notificationRoutes.js';
+import donationRoutes from './donationRoutes.js';
 
 const router = express.Router();
 
@@ -15,6 +16,9 @@ router.use('/auth', authRoutes);
 
 // Rescue case endpoints (/api/cases)
 router.use('/cases', caseRoutes);
+
+// Donation endpoints (/api/donations)
+router.use('/donations', donationRoutes);
 
 // Admin endpoints (/api/admin)
 router.use('/admin', adminRoutes);

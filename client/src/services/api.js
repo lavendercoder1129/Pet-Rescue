@@ -142,6 +142,34 @@ export const rejectAdminCase = async (id, reviewNote, rejectionReason) => {
 };
 
 /**
+ * Donations Endpoints
+ */
+export const createDonation = async (donationData) => {
+  const response = await api.post('/donations', donationData);
+  return response.data;
+};
+
+export const getMyDonations = async (params = {}) => {
+  const response = await api.get('/donations/my', { params });
+  return response.data;
+};
+
+export const getDonationById = async (id) => {
+  const response = await api.get(`/donations/${id}`);
+  return response.data;
+};
+
+export const getAdminDonations = async (params = {}) => {
+  const response = await api.get('/admin/donations', { params });
+  return response.data;
+};
+
+export const getAdminDonationStats = async () => {
+  const response = await api.get('/admin/donations/stats');
+  return response.data;
+};
+
+/**
  * Notifications Endpoints
  */
 export const getNotifications = async () => {

@@ -69,6 +69,11 @@ export const AdminDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link to="/admin/donations">
+              <OutlineButton size="sm">
+                Donations Overview
+              </OutlineButton>
+            </Link>
             <Link to="/admin/cases">
               <PrimaryButton size="sm" icon={ClipboardCheck}>
                 Review Emergency Cases

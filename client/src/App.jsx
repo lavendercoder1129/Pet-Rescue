@@ -11,6 +11,9 @@ import DesignSystemPage from './pages/DesignSystemPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DonatePage from './pages/DonatePage';
+import DonationReceiptPage from './pages/donor/DonationReceiptPage';
+import DonorDonationsPage from './pages/donor/DonorDonationsPage';
+import AdminDonationsPage from './pages/admin/AdminDonationsPage';
 
 // Dashboards
 import DonorDashboard from './pages/dashboards/DonorDashboard';
@@ -45,8 +48,26 @@ export function App() {
             <Route path="donor-wall" element={<DonorWallPage />} />
             <Route path="design-system" element={<DesignSystemPage />} />
 
-            {/* Donation Placeholder Route */}
+            {/* Donation Workflow Routes */}
             <Route path="donate/:caseId" element={<DonatePage />} />
+            <Route
+              path="donation/success/:donationId"
+              element={
+                <ProtectedRoute>
+                  <DonationReceiptPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Donor Donation History */}
+            <Route
+              path="donor/donations"
+              element={
+                <ProtectedRoute>
+                  <DonorDonationsPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Authentication Pages */}
             <Route path="login" element={<LoginPage />} />
@@ -127,6 +148,18 @@ export function App() {
                 <ProtectedRoute>
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <AdminCaseReviewPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Donations Overview */}
+            <Route
+              path="admin/donations"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminDonationsPage />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

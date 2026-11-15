@@ -10,6 +10,10 @@ import {
   approveCase,
   rejectCase,
 } from '../controllers/caseController.js';
+import {
+  getAdminDonations,
+  getAdminDonationStats,
+} from '../controllers/donationController.js';
 
 const router = express.Router();
 
@@ -99,5 +103,11 @@ router.get('/cases/:id', verifyAuth, requireRoles('admin'), getAdminCaseById);
 router.get('/cases/:id/history', verifyAuth, requireRoles('admin'), getCaseAuditHistory);
 router.patch('/cases/:id/approve', verifyAuth, requireRoles('admin'), approveCase);
 router.patch('/cases/:id/reject', verifyAuth, requireRoles('admin'), rejectCase);
+
+/**
+ * Admin Donations Overview Endpoints under /api/admin/donations
+ */
+router.get('/donations/stats', verifyAuth, requireRoles('admin'), getAdminDonationStats);
+router.get('/donations', verifyAuth, requireRoles('admin'), getAdminDonations);
 
 export default router;

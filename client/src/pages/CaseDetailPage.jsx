@@ -279,12 +279,12 @@ export const CaseDetailPage = () => {
                     <span className="font-serif text-3xl sm:text-4xl font-bold text-forest">
                       ₹{rescueCase.amountCollected.toLocaleString()}
                     </span>
-                    <span className="text-xs text-charcoal-muted ml-1">raised</span>
+                    <span className="text-xs text-charcoal-muted ml-1">simulated raised</span>
                   </div>
                   <span className="font-bold text-forest text-lg">{percentage}%</span>
                 </div>
                 <div className="text-xs text-charcoal-muted mt-1">
-                  goal of ₹{rescueCase.fundraisingGoal.toLocaleString()} • ₹{remaining.toLocaleString()} remaining
+                  goal of ₹{rescueCase.fundraisingGoal.toLocaleString()} • ₹{remaining.toLocaleString()} remaining target
                 </div>
               </div>
 

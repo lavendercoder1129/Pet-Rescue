@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShieldAlert, LogOut, PlusCircle, AlertCircle, Clock, FileCheck, FolderHeart } from 'lucide-react';
+import { ShieldAlert, LogOut, PlusCircle, AlertCircle, Clock, FileCheck, FolderHeart, Receipt, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Container from '../../components/layout/Container';
 import Section from '../../components/layout/Section';
@@ -40,6 +40,11 @@ export const RescuerDashboard = () => {
             <Link to="/rescuer/cases">
               <OutlineButton size="sm" icon={FolderHeart}>
                 My Submissions
+              </OutlineButton>
+            </Link>
+            <Link to="/rescuer/expenses">
+              <OutlineButton size="sm" icon={Receipt}>
+                My Expenses
               </OutlineButton>
             </Link>
             <OutlineButton size="sm" icon={LogOut} onClick={logout}>
@@ -116,7 +121,7 @@ export const RescuerDashboard = () => {
             <p className="text-xs text-charcoal-muted leading-relaxed font-sans">
               Create an emergency case with GPS landmark, injury photos, admitting clinic contact, and preliminary veterinary surgery estimates.
             </p>
-            <div className="pt-2 flex items-center gap-3">
+            <div className="pt-2 flex flex-wrap items-center gap-3">
               {isVerified ? (
                 <Link to="/rescuer/cases/new">
                   <PrimaryButton size="sm" icon={PlusCircle}>
@@ -132,6 +137,12 @@ export const RescuerDashboard = () => {
               <Link to="/rescuer/cases">
                 <OutlineButton size="sm">
                   View My Cases
+                </OutlineButton>
+              </Link>
+
+              <Link to="/rescuer/expenses">
+                <OutlineButton size="sm" icon={Receipt}>
+                  Submit / View Expenses
                 </OutlineButton>
               </Link>
             </div>

@@ -11,6 +11,10 @@ import DesignSystemPage from './pages/DesignSystemPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DonatePage from './pages/DonatePage';
+import DonationReceiptPage from './pages/donor/DonationReceiptPage';
+import DonorDonationsPage from './pages/donor/DonorDonationsPage';
+import AdminDonationsPage from './pages/admin/AdminDonationsPage';
+import AdminFundsPage from './pages/admin/AdminFundsPage';
 
 // Dashboards
 import DonorDashboard from './pages/dashboards/DonorDashboard';
@@ -24,6 +28,12 @@ import NewCasePage from './pages/rescuer/NewCasePage';
 // Admin Case Verification Pages
 import AdminCasesPage from './pages/admin/AdminCasesPage';
 import AdminCaseReviewPage from './pages/admin/AdminCaseReviewPage';
+
+// Rescuer & Admin Expense Pages (Module 8)
+import NewExpensePage from './pages/rescuer/NewExpensePage';
+import RescuerExpensesPage from './pages/rescuer/RescuerExpensesPage';
+import AdminExpensesPage from './pages/admin/AdminExpensesPage';
+import AdminExpenseReviewPage from './pages/admin/AdminExpenseReviewPage';
 
 // Route Protection
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -45,8 +55,26 @@ export function App() {
             <Route path="donor-wall" element={<DonorWallPage />} />
             <Route path="design-system" element={<DesignSystemPage />} />
 
-            {/* Donation Placeholder Route */}
+            {/* Donation Workflow Routes */}
             <Route path="donate/:caseId" element={<DonatePage />} />
+            <Route
+              path="donation/success/:donationId"
+              element={
+                <ProtectedRoute>
+                  <DonationReceiptPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Donor Donation History */}
+            <Route
+              path="donor/donations"
+              element={
+                <ProtectedRoute>
+                  <DonorDonationsPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Authentication Pages */}
             <Route path="login" element={<LoginPage />} />
@@ -109,6 +137,29 @@ export function App() {
               }
             />
 
+            {/* Rescuer Expense Tracking Routes (Module 8) */}
+            <Route
+              path="rescuer/expenses"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['rescuer', 'admin']}>
+                    <RescuerExpensesPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="rescuer/expenses/new"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['rescuer', 'admin']}>
+                    <NewExpensePage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Admin Case Verification Routes */}
             <Route
               path="admin/cases"
@@ -127,6 +178,53 @@ export function App() {
                 <ProtectedRoute>
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <AdminCaseReviewPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Donations Overview */}
+            <Route
+              path="admin/donations"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminDonationsPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Fund Allocation Dashboard */}
+            <Route
+              path="admin/funds"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminFundsPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Expense Verification Routes (Module 8) */}
+            <Route
+              path="admin/expenses"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminExpensesPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="admin/expenses/:id"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminExpenseReviewPage />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

@@ -34,9 +34,14 @@ export const DonorDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link to="/donor/donations">
+              <OutlineButton size="sm" icon={History}>
+                My Donations
+              </OutlineButton>
+            </Link>
             <Link to="/cases">
               <PrimaryButton size="sm" icon={Heart}>
-                Explore Active Rescues
+                Explore Rescues
               </PrimaryButton>
             </Link>
             <OutlineButton size="sm" icon={LogOut} onClick={logout}>

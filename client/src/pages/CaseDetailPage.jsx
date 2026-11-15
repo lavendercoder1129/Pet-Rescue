@@ -265,6 +265,113 @@ export const CaseDetailPage = () => {
                 </div>
               )}
             </BaseCard>
+
+            {/* Financial Transparency Section (Module 7) */}
+            <BaseCard padding="lg" className="space-y-5 bg-white shadow-warm-xs border border-grey-light font-sans">
+              <div className="flex items-center justify-between border-b border-grey-light pb-3">
+                <div className="flex items-center gap-2 text-forest">
+                  <ShieldCheck className="w-5 h-5 text-forest" />
+                  <h3 className="font-serif text-xl font-bold">
+                    Escrow Financial Transparency
+                  </h3>
+                </div>
+                <span className="text-[11px] font-semibold uppercase text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Public Ledger
+                </span>
+              </div>
+
+              <p className="text-xs text-charcoal-muted leading-relaxed">
+                Every rupee pledged to {rescueCase.animalName} is tracked across verified surgical allocations and audited clinic receipts. Unspent balances remain locked in case escrow.
+              </p>
+
+              {/* 5 Metrics Matrix */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-ivory-warm border border-grey-light space-y-0.5">
+                  <span className="text-[10px] uppercase font-semibold text-charcoal-muted block">
+                    Simulated Donations
+                  </span>
+                  <strong className="font-serif text-lg font-bold text-forest block">
+                    ₹{(rescueCase.financials?.totalDonations ?? rescueCase.amountCollected ?? 0).toLocaleString()}
+                  </strong>
+                  <span className="text-[10px] text-charcoal-muted">Pledged across donors</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-ivory-warm border border-grey-light space-y-0.5">
+                  <span className="text-[10px] uppercase font-semibold text-charcoal-muted block">
+                    Total Allocated
+                  </span>
+                  <strong className="font-serif text-lg font-bold text-charcoal block">
+                    ₹{(rescueCase.financials?.totalAllocated ?? 0).toLocaleString()}
+                  </strong>
+                  <span className="text-[10px] text-charcoal-muted">Committed to treatment</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-ivory-warm border border-grey-light space-y-0.5">
+                  <span className="text-[10px] uppercase font-semibold text-charcoal-muted block">
+                    Verified Spending
+                  </span>
+                  <strong className="font-serif text-lg font-bold text-charcoal block">
+                    ₹{(rescueCase.financials?.totalVerifiedSpending ?? 0).toLocaleString()}
+                  </strong>
+                  <span className="text-[10px] text-charcoal-muted">Audited clinic invoices</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-sage-wash/70 border border-sage/40 space-y-0.5">
+                  <span className="text-[10px] uppercase font-semibold text-charcoal-muted block">
+                    Remaining Balance
+                  </span>
+                  <strong className="font-serif text-lg font-bold text-forest block">
+                    ₹{(rescueCase.financials?.remainingAllocatedBalance ?? 0).toLocaleString()}
+                  </strong>
+                  <span className="text-[10px] text-charcoal-muted">Available in escrow</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-orange-subtle/50 border border-orange-muted/30 space-y-0.5">
+                  <span className="text-[10px] uppercase font-semibold text-charcoal-muted block">
+                    Unallocated Funds
+                  </span>
+                  <strong className="font-serif text-lg font-bold text-orange-hover block">
+                    ₹{(rescueCase.financials?.unallocatedFunds ?? 0).toLocaleString()}
+                  </strong>
+                  <span className="text-[10px] text-charcoal-muted">Pending category allocation</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-ivory-warm border border-grey-light space-y-0.5">
+                  <span className="text-[10px] uppercase font-semibold text-charcoal-muted block">
+                    Fund Utilization
+                  </span>
+                  <strong className="font-serif text-lg font-bold text-forest block">
+                    {rescueCase.financials?.fundUtilization ?? 0}%
+                  </strong>
+                  <span className="text-[10px] text-charcoal-muted">Spent vs Allocated</span>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-1 pt-2">
+                <div className="flex justify-between text-xs text-charcoal-muted">
+                  <span>Treatment Allocation Utilization</span>
+                  <span className="font-semibold text-forest">
+                    {rescueCase.financials?.fundUtilization ?? 0}%
+                  </span>
+                </div>
+                <ProgressBar
+                  value={rescueCase.financials?.totalVerifiedSpending ?? 0}
+                  max={rescueCase.financials?.totalAllocated || 1}
+                  variant="emerald"
+                  size="sm"
+                />
+              </div>
+
+              <div className="pt-2 text-right">
+                <Link
+                  to="/transparency"
+                  className="text-xs font-semibold text-forest hover:underline inline-flex items-center gap-1"
+                >
+                  View Overall Platform Transparency Ledger →
+                </Link>
+              </div>
+            </BaseCard>
           </div>
 
           {/* Right Sidebar: Campaign Crowdfunding Progress */}
@@ -279,12 +386,12 @@ export const CaseDetailPage = () => {
                     <span className="font-serif text-3xl sm:text-4xl font-bold text-forest">
                       ₹{rescueCase.amountCollected.toLocaleString()}
                     </span>
-                    <span className="text-xs text-charcoal-muted ml-1">raised</span>
+                    <span className="text-xs text-charcoal-muted ml-1">simulated raised</span>
                   </div>
                   <span className="font-bold text-forest text-lg">{percentage}%</span>
                 </div>
                 <div className="text-xs text-charcoal-muted mt-1">
-                  goal of ₹{rescueCase.fundraisingGoal.toLocaleString()} • ₹{remaining.toLocaleString()} remaining
+                  goal of ₹{rescueCase.fundraisingGoal.toLocaleString()} • ₹{remaining.toLocaleString()} remaining target
                 </div>
               </div>
 

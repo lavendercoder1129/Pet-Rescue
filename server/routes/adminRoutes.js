@@ -10,6 +10,22 @@ import {
   approveCase,
   rejectCase,
 } from '../controllers/caseController.js';
+import {
+  getAdminDonations,
+  getAdminDonationStats,
+} from '../controllers/donationController.js';
+import {
+  getAdminFundsSummary,
+  getAdminAllocations,
+  createFundAllocation,
+  getAdminCaseFinancials,
+} from '../controllers/fundController.js';
+import {
+  getAdminExpenses,
+  getAdminExpenseById,
+  approveExpense,
+  rejectExpense,
+} from '../controllers/expenseController.js';
 
 const router = express.Router();
 
@@ -99,5 +115,27 @@ router.get('/cases/:id', verifyAuth, requireRoles('admin'), getAdminCaseById);
 router.get('/cases/:id/history', verifyAuth, requireRoles('admin'), getCaseAuditHistory);
 router.patch('/cases/:id/approve', verifyAuth, requireRoles('admin'), approveCase);
 router.patch('/cases/:id/reject', verifyAuth, requireRoles('admin'), rejectCase);
+
+/**
+ * Admin Donations Overview Endpoints under /api/admin/donations
+ */
+router.get('/donations/stats', verifyAuth, requireRoles('admin'), getAdminDonationStats);
+router.get('/donations', verifyAuth, requireRoles('admin'), getAdminDonations);
+
+/**
+ * Admin Fund Allocation Endpoints under /api/admin/funds
+ */
+router.get('/funds/summary', verifyAuth, requireRoles('admin'), getAdminFundsSummary);
+router.get('/funds/allocations', verifyAuth, requireRoles('admin'), getAdminAllocations);
+router.post('/funds/allocations', verifyAuth, requireRoles('admin'), createFundAllocation);
+router.get('/funds/cases/:caseId', verifyAuth, requireRoles('admin'), getAdminCaseFinancials);
+
+/**
+ * Admin Expense Verification Endpoints under /api/admin/expenses
+ */
+router.get('/expenses', verifyAuth, requireRoles('admin'), getAdminExpenses);
+router.get('/expenses/:id', verifyAuth, requireRoles('admin'), getAdminExpenseById);
+router.patch('/expenses/:id/approve', verifyAuth, requireRoles('admin'), approveExpense);
+router.patch('/expenses/:id/reject', verifyAuth, requireRoles('admin'), rejectExpense);
 
 export default router;

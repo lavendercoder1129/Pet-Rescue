@@ -50,6 +50,11 @@ lerna-debug.log*
 ehthumbs.db
 Thumbs.db
 
+# Uploaded Files
+server/uploads/
+server/uploads/*
+!server/uploads/.gitkeep
+
 # Temporary test / cache files
 .cache/
 .eslintcache

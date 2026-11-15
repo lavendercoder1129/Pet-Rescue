@@ -142,6 +142,107 @@ export const rejectAdminCase = async (id, reviewNote, rejectionReason) => {
 };
 
 /**
+ * Donations Endpoints
+ */
+export const createDonation = async (donationData) => {
+  const response = await api.post('/donations', donationData);
+  return response.data;
+};
+
+export const getMyDonations = async (params = {}) => {
+  const response = await api.get('/donations/my', { params });
+  return response.data;
+};
+
+export const getDonationById = async (id) => {
+  const response = await api.get(`/donations/${id}`);
+  return response.data;
+};
+
+export const getAdminDonations = async (params = {}) => {
+  const response = await api.get('/admin/donations', { params });
+  return response.data;
+};
+
+export const getAdminDonationStats = async () => {
+  const response = await api.get('/admin/donations/stats');
+  return response.data;
+};
+
+/**
+ * Transparency & Fund Allocation Endpoints
+ */
+export const getTransparencySummary = async () => {
+  const response = await api.get('/transparency/summary');
+  return response.data;
+};
+
+export const getTransparencyCases = async (params = {}) => {
+  const response = await api.get('/transparency/cases', { params });
+  return response.data;
+};
+
+export const getAdminFundsSummary = async () => {
+  const response = await api.get('/admin/funds/summary');
+  return response.data;
+};
+
+export const getAdminAllocations = async (params = {}) => {
+  const response = await api.get('/admin/funds/allocations', { params });
+  return response.data;
+};
+
+export const createFundAllocation = async (allocationData) => {
+  const response = await api.post('/admin/funds/allocations', allocationData);
+  return response.data;
+};
+
+export const getAdminCaseFinancials = async (caseId) => {
+  const response = await api.get(`/admin/funds/cases/${caseId}`);
+  return response.data;
+};
+
+/**
+ * Expenses Endpoints (Module 8)
+ */
+export const submitExpense = async (formData) => {
+  const response = await api.post('/expenses', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+export const getMyExpenses = async (params = {}) => {
+  const response = await api.get('/expenses/my', { params });
+  return response.data;
+};
+
+export const getExpenseById = async (id) => {
+  const response = await api.get(`/expenses/${id}`);
+  return response.data;
+};
+
+export const getAdminExpenses = async (params = {}) => {
+  const response = await api.get('/admin/expenses', { params });
+  return response.data;
+};
+
+export const getAdminExpenseById = async (id) => {
+  const response = await api.get(`/admin/expenses/${id}`);
+  return response.data;
+};
+
+export const approveAdminExpense = async (id, reviewNote) => {
+  const response = await api.patch(`/admin/expenses/${id}/approve`, { reviewNote });
+  return response.data;
+};
+
+export const rejectAdminExpense = async (id, reviewNote) => {
+  const response = await api.patch(`/admin/expenses/${id}/reject`, { reviewNote });
+  return response.data;
+};
+
+/**
  * Notifications Endpoints
  */
 export const getNotifications = async () => {

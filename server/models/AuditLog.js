@@ -14,6 +14,12 @@ const auditLogSchema = new mongoose.Schema(
       required: false,
       index: true,
     },
+    updateId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'RescueUpdate',
+      required: false,
+      index: true,
+    },
     adminId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -30,6 +36,8 @@ const auditLogSchema = new mongoose.Schema(
         'Expense Submitted',
         'Expense Approved',
         'Expense Rejected',
+        'Update Approved',
+        'Update Rejected',
       ],
     },
     previousStatus: {

@@ -8,8 +8,11 @@ import {
   ShieldCheck,
   AlertCircle,
   User,
+  Clock,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
-import { getPublicCaseById } from '../services/api';
+import { getPublicCaseById, getCasePublishedUpdates } from '../services/api';
 import Container from '../components/layout/Container';
 import Section from '../components/layout/Section';
 import BaseCard from '../components/cards/BaseCard';
@@ -23,6 +26,8 @@ export const CaseDetailPage = () => {
   const { id } = useParams();
 
   const [rescueCase, setRescueCase] = useState(null);
+  const [updates, setUpdates] = useState([]);
+  const [loadingUpdates, setLoadingUpdates] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,6 +40,8 @@ export const CaseDetailPage = () => {
         const data = await getPublicCaseById(id);
         if (data && data.success && data.case) {
           setRescueCase(data.case);
+          // Fetch timeline updates
+          fetchTimelineUpdates(id);
         } else {
           setError('Rescue case not found or not publicly accessible.');
         }
@@ -42,6 +49,20 @@ export const CaseDetailPage = () => {
         setError(err.message || 'Rescue case not found or is currently pending administrative review.');
       } finally {
         setLoading(false);
+      }
+    };
+
+    const fetchTimelineUpdates = async (caseId) => {
+      try {
+        setLoadingUpdates(true);
+        const updatesData = await getCasePublishedUpdates(caseId);
+        if (updatesData && updatesData.success) {
+          setUpdates(updatesData.updates || []);
+        }
+      } catch {
+        // Non-blocking
+      } finally {
+        setLoadingUpdates(false);
       }
     };
 
@@ -371,6 +392,102 @@ export const CaseDetailPage = () => {
                   View Overall Platform Transparency Ledger →
                 </Link>
               </div>
+            </BaseCard>
+
+            {/* Chronological Rescue Updates & Recovery Timeline (Module 9) */}
+            <BaseCard padding="lg" className="space-y-6 bg-white shadow-warm border border-grey-light">
+              <div className="border-b border-grey-light pb-4 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-forest font-sans">
+                    Clinical Milestones
+                  </span>
+                  <h2 className="font-serif text-2xl font-bold text-forest mt-1">
+                    Recovery & Treatment Timeline
+                  </h2>
+                </div>
+                <span className="text-xs font-mono text-charcoal-muted">
+                  {updates.length} verified milestone{updates.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              {loadingUpdates ? (
+                <div className="py-8">
+                  <LoadingState message="Loading verified milestone timeline..." />
+                </div>
+              ) : updates.length === 0 ? (
+                <div className="p-6 rounded-2xl bg-ivory-warm/40 border border-dashed border-grey-light text-center space-y-2">
+                  <Clock className="w-8 h-8 mx-auto text-charcoal-muted opacity-60" />
+                  <h3 className="font-serif font-bold text-base text-forest">
+                    Intake & Diagnostics in Progress
+                  </h3>
+                  <p className="text-xs text-charcoal-muted max-w-md mx-auto leading-relaxed">
+                    The attending veterinary clinic and verified rescuer are currently administering initial emergency triage. Recovery reports and photographs will appear here as treatment progresses.
+                  </p>
+                </div>
+              ) : (
+                <div className="relative pl-6 border-l-2 border-forest/30 space-y-8 font-sans">
+                  {updates.map((update, index) => (
+                    <div key={update._id || index} className="relative group">
+                      {/* Timeline dot */}
+                      <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-forest border-2 border-white shadow-warm-xs flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-ivory" />
+                      </div>
+
+                      <div className="space-y-2 bg-ivory-warm/30 rounded-2xl p-4 border border-grey-light/60">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-grey-light/40 pb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-forest text-ivory">
+                              {update.milestone}
+                            </span>
+                            <span className="text-xs font-mono text-charcoal-muted">
+                              Stage {index + 1}
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-charcoal-muted flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-sage-dark" />
+                            {new Date(update.createdAt).toLocaleDateString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </span>
+                        </div>
+
+                        <h3 className="font-serif font-bold text-lg text-forest">
+                          {update.title}
+                        </h3>
+
+                        <p className="text-xs text-charcoal leading-relaxed whitespace-pre-line">
+                          {update.description}
+                        </p>
+
+                        {/* Image Strip */}
+                        {update.images && update.images.length > 0 && (
+                          <div className="pt-2">
+                            <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
+                              {update.images.map((img, i) => (
+                                <a
+                                  key={i}
+                                  href={img.startsWith('http') ? img : `http://localhost:5000${img}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-20 h-20 rounded-xl overflow-hidden border border-grey-light flex-shrink-0 bg-ivory-warm hover:scale-105 transition-transform"
+                                >
+                                  <img
+                                    src={img.startsWith('http') ? img : `http://localhost:5000${img}`}
+                                    alt={`milestone-${i}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </BaseCard>
           </div>
 

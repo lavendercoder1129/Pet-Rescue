@@ -158,12 +158,33 @@ npm run build
 - [x] **Module 0: Foundation & GitHub Connection** (Completed)
 - [x] **Module 1: Design System & Reusable Components** (Completed)
 - [x] **Module 2: Homepage & Emergency Campaign Interface** (Completed)
-- [x] **Module 3: Authentication & User Roles (Donor, Rescuer, Admin)** (Active)
-- [ ] **Module 4: Emergency Rescue Cases (Creation, Triage & Browsing)** (Next)
-- [ ] **Module 5: Admin Case Verification & Expenditure Proofs**
-- [ ] **Module 6: Simulated Donation & Escrow System**
-- [ ] **Module 7: Treatment Progress & Public Updates**
-- [ ] **Module 8: Donor Recognition & Transparency Ledger**
-- [ ] **Module 9: System Polish, Accessibility & Packaging**
+- [x] **Module 3: Authentication & User Roles (Donor, Rescuer, Admin)** (Completed)
+- [x] **Module 4: Emergency Rescue Cases (Creation, Triage & Browsing)** (Completed)
+- [x] **Module 5: Admin Case Verification & Review Workflow** (Completed)
+- [x] **Module 6: Simulated Donation System & Digital Receipts** (Completed)
+- [x] **Module 7: Fund Allocation & Financial Transparency Dashboard** (Completed)
+- [x] **Module 8: Expense Proof Upload & Admin Verification** (Completed)
+- [x] **Module 9: Rescue Updates & Emergency Announcements** (Completed)
+- [ ] **Module 10: Donor Recognition, Leaderboards & Achievement Badges** (Next)
+
+---
+
+## 📢 Module 9: Rescue Updates & Emergency Announcements
+
+### Features
+1. **Rescue Updates Clinical Journal**:
+   - Authorized rescuers document milestones (`rescued`, `veterinary examination`, `treatment`, `recovering`, `recovered`, `released`, `other`) for their approved rescue cases.
+   - Upload up to 5 photographs per update (`JPEG`, `PNG`, `WebP`).
+   - Administrative review queue (`/admin/rescue-updates`) with approval or rejection (requiring mandatory feedback).
+   - Chronological public recovery timeline integrated into case detail views (`/cases/:id`).
+2. **Platform & Emergency Announcements**:
+   - Administrators create, draft, publish, and archive announcements (`general`, `urgent`, `emergency`).
+   - Active broadcasts rendered in global notification banners and the dedicated `/announcements` directory.
+   - Dynamic date filtering ensures expired or archived announcements are excluded from public view.
+
+### Running Module 9 Tests
+```bash
+node server/scripts/testModule9.js
+```
 
 For full technical specifications, refer to [`docs/PROJECT_ROADMAP.md`](./docs/PROJECT_ROADMAP.md).

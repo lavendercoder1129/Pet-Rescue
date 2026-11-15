@@ -7,6 +7,8 @@ import notificationRoutes from './notificationRoutes.js';
 import donationRoutes from './donationRoutes.js';
 import transparencyRoutes from './transparencyRoutes.js';
 import expenseRoutes from './expenseRoutes.js';
+import rescueUpdateRoutes from './rescueUpdateRoutes.js';
+import announcementRoutes from './announcementRoutes.js';
 
 const router = express.Router();
 
@@ -24,6 +26,12 @@ router.use('/donations', donationRoutes);
 
 // Expense endpoints (/api/expenses)
 router.use('/expenses', expenseRoutes);
+
+// Rescue updates endpoints (/api/rescue-updates)
+router.use('/rescue-updates', rescueUpdateRoutes);
+
+// Announcements endpoints (/api/announcements)
+router.use('/announcements', announcementRoutes);
 
 // Admin endpoints (/api/admin)
 router.use('/admin', adminRoutes);

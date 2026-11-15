@@ -26,6 +26,11 @@ import {
   approveExpense,
   rejectExpense,
 } from '../controllers/expenseController.js';
+import {
+  getAdminRescueUpdates,
+  approveRescueUpdate,
+  rejectRescueUpdate,
+} from '../controllers/rescueUpdateController.js';
 
 const router = express.Router();
 
@@ -137,5 +142,12 @@ router.get('/expenses', verifyAuth, requireRoles('admin'), getAdminExpenses);
 router.get('/expenses/:id', verifyAuth, requireRoles('admin'), getAdminExpenseById);
 router.patch('/expenses/:id/approve', verifyAuth, requireRoles('admin'), approveExpense);
 router.patch('/expenses/:id/reject', verifyAuth, requireRoles('admin'), rejectExpense);
+
+/**
+ * Admin Rescue Updates Moderation Endpoints under /api/admin/rescue-updates
+ */
+router.get('/rescue-updates', verifyAuth, requireRoles('admin'), getAdminRescueUpdates);
+router.patch('/rescue-updates/:id/approve', verifyAuth, requireRoles('admin'), approveRescueUpdate);
+router.patch('/rescue-updates/:id/reject', verifyAuth, requireRoles('admin'), rejectRescueUpdate);
 
 export default router;

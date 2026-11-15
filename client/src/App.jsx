@@ -35,6 +35,14 @@ import RescuerExpensesPage from './pages/rescuer/RescuerExpensesPage';
 import AdminExpensesPage from './pages/admin/AdminExpensesPage';
 import AdminExpenseReviewPage from './pages/admin/AdminExpenseReviewPage';
 
+// Rescue Updates & Announcements Pages (Module 9)
+import RescuerCasesUpdatesPage from './pages/rescuer/RescuerCasesUpdatesPage';
+import NewRescueUpdatePage from './pages/rescuer/NewRescueUpdatePage';
+import RescuerUpdatesHistoryPage from './pages/rescuer/RescuerUpdatesHistoryPage';
+import AdminRescueUpdatesPage from './pages/admin/AdminRescueUpdatesPage';
+import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage';
+import AnnouncementsPage from './pages/AnnouncementsPage';
+
 // Route Protection
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
@@ -53,6 +61,7 @@ export function App() {
             <Route path="how-it-works" element={<HowItWorksPage />} />
             <Route path="transparency" element={<TransparencyPage />} />
             <Route path="donor-wall" element={<DonorWallPage />} />
+            <Route path="announcements" element={<AnnouncementsPage />} />
             <Route path="design-system" element={<DesignSystemPage />} />
 
             {/* Donation Workflow Routes */}
@@ -160,6 +169,40 @@ export function App() {
               }
             />
 
+            {/* Rescuer Progress Updates Routes (Module 9) */}
+            <Route
+              path="rescuer/updates"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['rescuer', 'admin']}>
+                    <RescuerCasesUpdatesPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="rescuer/updates/new"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['rescuer', 'admin']}>
+                    <NewRescueUpdatePage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="rescuer/updates/history"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['rescuer', 'admin']}>
+                    <RescuerUpdatesHistoryPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Admin Case Verification Routes */}
             <Route
               path="admin/cases"
@@ -225,6 +268,29 @@ export function App() {
                 <ProtectedRoute>
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <AdminExpenseReviewPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Rescue Updates & Announcements Routes (Module 9) */}
+            <Route
+              path="admin/rescue-updates"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminRescueUpdatesPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="admin/announcements"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminAnnouncementsPage />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

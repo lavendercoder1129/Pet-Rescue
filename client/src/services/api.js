@@ -260,4 +260,89 @@ export const markAllNotificationsRead = async () => {
   return response.data;
 };
 
+/**
+ * Rescue Updates Endpoints (Module 9)
+ */
+export const submitRescueUpdate = async (formData) => {
+  const response = await api.post('/rescue-updates', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+export const getMyUpdates = async (params = {}) => {
+  const response = await api.get('/rescue-updates/my-updates', { params });
+  return response.data;
+};
+
+export const getMyEligibleCases = async () => {
+  const response = await api.get('/rescue-updates/my-cases');
+  return response.data;
+};
+
+export const getRescueUpdateById = async (id) => {
+  const response = await api.get(`/rescue-updates/${id}`);
+  return response.data;
+};
+
+export const editRescueUpdate = async (id, formData) => {
+  const response = await api.patch(`/rescue-updates/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+export const getCasePublishedUpdates = async (caseId) => {
+  const response = await api.get(`/rescue-updates/case/${caseId}`);
+  return response.data;
+};
+
+export const getAdminRescueUpdates = async (params = {}) => {
+  const response = await api.get('/admin/rescue-updates', { params });
+  return response.data;
+};
+
+export const approveAdminRescueUpdate = async (id, adminFeedback = '') => {
+  const response = await api.patch(`/admin/rescue-updates/${id}/approve`, { adminFeedback });
+  return response.data;
+};
+
+export const rejectAdminRescueUpdate = async (id, reason) => {
+  const response = await api.patch(`/admin/rescue-updates/${id}/reject`, { reason });
+  return response.data;
+};
+
+/**
+ * Announcements Endpoints (Module 9)
+ */
+export const getActiveAnnouncements = async () => {
+  const response = await api.get('/announcements/active');
+  return response.data;
+};
+
+export const getAdminAnnouncements = async (params = {}) => {
+  const response = await api.get('/announcements', { params });
+  return response.data;
+};
+
+export const getAnnouncementById = async (id) => {
+  const response = await api.get(`/announcements/${id}`);
+  return response.data;
+};
+
+export const createAnnouncement = async (data) => {
+  const response = await api.post('/announcements', data);
+  return response.data;
+};
+
+export const updateAnnouncement = async (id, data) => {
+  const response = await api.patch(`/announcements/${id}`, data);
+  return response.data;
+};
+
+export const archiveAnnouncement = async (id) => {
+  const response = await api.patch(`/announcements/${id}/archive`);
+  return response.data;
+};
+
 export default api;

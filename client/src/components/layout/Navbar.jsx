@@ -24,6 +24,7 @@ export const Navbar = () => {
     { label: 'Emergency Cases', path: '/cases' },
     { label: 'How It Works', path: '/how-it-works' },
     { label: 'Transparency', path: '/transparency' },
+    { label: 'Announcements', path: '/announcements' },
     { label: 'Donor Wall', path: '/donor-wall' },
   ];
 

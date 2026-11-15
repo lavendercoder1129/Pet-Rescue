@@ -64,6 +64,7 @@ export const Navbar = () => {
             <Link
               to="/design-system"
               className="text-xs px-2.5 py-1 rounded-md text-charcoal-muted hover:text-forest bg-sage-wash/60 border border-sage/30 transition-colors"
+              title="Module 1 Showcase"
             >
               UI System
             </Link>
@@ -71,14 +72,14 @@ export const Navbar = () => {
             <button
               type="button"
               className="px-3.5 py-2 text-sm font-medium text-charcoal hover:text-forest transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
-              onClick={() => alert('Authentication will be implemented in Module 2.')}
+              onClick={() => alert('Authentication will be implemented in Module 3 — Authentication & User Roles.')}
             >
               Login
             </button>
             <button
               type="button"
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-forest text-ivory hover:bg-forest-light shadow-warm-sm active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
-              onClick={() => alert('Registration will be implemented in Module 2.')}
+              onClick={() => alert('Registration will be implemented in Module 3 — Authentication & User Roles.')}
             >
               <Heart className="w-4 h-4 text-orange-muted" />
               Register
@@ -136,7 +137,7 @@ export const Navbar = () => {
               className="w-full py-2.5 text-center text-sm font-medium text-charcoal rounded-lg border border-grey-light bg-white hover:bg-ivory-warm transition-colors"
               onClick={() => {
                 closeMobile();
-                alert('Authentication will be implemented in Module 2.');
+                alert('Authentication will be implemented in Module 3 — Authentication & User Roles.');
               }}
             >
               Login
@@ -146,7 +147,7 @@ export const Navbar = () => {
               className="w-full py-2.5 text-center text-sm font-medium rounded-lg bg-forest text-ivory hover:bg-forest-light shadow-warm-sm transition-colors"
               onClick={() => {
                 closeMobile();
-                alert('Registration will be implemented in Module 2.');
+                alert('Registration will be implemented in Module 3 — Authentication & User Roles.');
               }}
             >
               Register

@@ -203,6 +203,46 @@ export const getAdminCaseFinancials = async (caseId) => {
 };
 
 /**
+ * Expenses Endpoints (Module 8)
+ */
+export const submitExpense = async (formData) => {
+  const response = await api.post('/expenses', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+export const getMyExpenses = async (params = {}) => {
+  const response = await api.get('/expenses/my', { params });
+  return response.data;
+};
+
+export const getExpenseById = async (id) => {
+  const response = await api.get(`/expenses/${id}`);
+  return response.data;
+};
+
+export const getAdminExpenses = async (params = {}) => {
+  const response = await api.get('/admin/expenses', { params });
+  return response.data;
+};
+
+export const getAdminExpenseById = async (id) => {
+  const response = await api.get(`/admin/expenses/${id}`);
+  return response.data;
+};
+
+export const approveAdminExpense = async (id, reviewNote) => {
+  const response = await api.patch(`/admin/expenses/${id}/approve`, { reviewNote });
+  return response.data;
+};
+
+export const rejectAdminExpense = async (id, reviewNote) => {
+  const response = await api.patch(`/admin/expenses/${id}/reject`, { reviewNote });
+  return response.data;
+};
+
+/**
  * Notifications Endpoints
  */
 export const getNotifications = async () => {

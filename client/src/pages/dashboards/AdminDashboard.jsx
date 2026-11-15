@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw, ClipboardCheck } from 'lucide-react';
+import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw, ClipboardCheck, Receipt } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import Container from '../../components/layout/Container';
@@ -73,6 +73,11 @@ export const AdminDashboard = () => {
               <PrimaryButton size="sm">
                 Fund Allocations
               </PrimaryButton>
+            </Link>
+            <Link to="/admin/expenses">
+              <OutlineButton size="sm" icon={Receipt}>
+                Expense Claims
+              </OutlineButton>
             </Link>
             <Link to="/admin/donations">
               <OutlineButton size="sm">

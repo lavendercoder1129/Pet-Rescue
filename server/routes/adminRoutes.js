@@ -20,6 +20,12 @@ import {
   createFundAllocation,
   getAdminCaseFinancials,
 } from '../controllers/fundController.js';
+import {
+  getAdminExpenses,
+  getAdminExpenseById,
+  approveExpense,
+  rejectExpense,
+} from '../controllers/expenseController.js';
 
 const router = express.Router();
 
@@ -123,5 +129,13 @@ router.get('/funds/summary', verifyAuth, requireRoles('admin'), getAdminFundsSum
 router.get('/funds/allocations', verifyAuth, requireRoles('admin'), getAdminAllocations);
 router.post('/funds/allocations', verifyAuth, requireRoles('admin'), createFundAllocation);
 router.get('/funds/cases/:caseId', verifyAuth, requireRoles('admin'), getAdminCaseFinancials);
+
+/**
+ * Admin Expense Verification Endpoints under /api/admin/expenses
+ */
+router.get('/expenses', verifyAuth, requireRoles('admin'), getAdminExpenses);
+router.get('/expenses/:id', verifyAuth, requireRoles('admin'), getAdminExpenseById);
+router.patch('/expenses/:id/approve', verifyAuth, requireRoles('admin'), approveExpense);
+router.patch('/expenses/:id/reject', verifyAuth, requireRoles('admin'), rejectExpense);
 
 export default router;

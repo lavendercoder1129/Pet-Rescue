@@ -5,7 +5,13 @@ const auditLogSchema = new mongoose.Schema(
     caseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'RescueCase',
-      required: [true, 'Case ID is required for audit history'],
+      required: false,
+      index: true,
+    },
+    expenseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Expense',
+      required: false,
       index: true,
     },
     adminId: {
@@ -16,7 +22,15 @@ const auditLogSchema = new mongoose.Schema(
     action: {
       type: String,
       required: [true, 'Action is required'],
-      enum: ['Approved', 'Rejected', 'Reopened', 'Resubmitted'],
+      enum: [
+        'Approved',
+        'Rejected',
+        'Reopened',
+        'Resubmitted',
+        'Expense Submitted',
+        'Expense Approved',
+        'Expense Rejected',
+      ],
     },
     previousStatus: {
       type: String,
@@ -43,6 +57,7 @@ const auditLogSchema = new mongoose.Schema(
 
 // High-speed index for retrieving case audit trails
 auditLogSchema.index({ caseId: 1, timestamp: -1 });
+auditLogSchema.index({ expenseId: 1, timestamp: -1 });
 
 export const AuditLog = mongoose.model('AuditLog', auditLogSchema);
 export default AuditLog;

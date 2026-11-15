@@ -29,6 +29,12 @@ import NewCasePage from './pages/rescuer/NewCasePage';
 import AdminCasesPage from './pages/admin/AdminCasesPage';
 import AdminCaseReviewPage from './pages/admin/AdminCaseReviewPage';
 
+// Rescuer & Admin Expense Pages (Module 8)
+import NewExpensePage from './pages/rescuer/NewExpensePage';
+import RescuerExpensesPage from './pages/rescuer/RescuerExpensesPage';
+import AdminExpensesPage from './pages/admin/AdminExpensesPage';
+import AdminExpenseReviewPage from './pages/admin/AdminExpenseReviewPage';
+
 // Route Protection
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
@@ -131,6 +137,29 @@ export function App() {
               }
             />
 
+            {/* Rescuer Expense Tracking Routes (Module 8) */}
+            <Route
+              path="rescuer/expenses"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['rescuer', 'admin']}>
+                    <RescuerExpensesPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="rescuer/expenses/new"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['rescuer', 'admin']}>
+                    <NewExpensePage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Admin Case Verification Routes */}
             <Route
               path="admin/cases"
@@ -173,6 +202,29 @@ export function App() {
                 <ProtectedRoute>
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <AdminFundsPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Expense Verification Routes (Module 8) */}
+            <Route
+              path="admin/expenses"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminExpensesPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="admin/expenses/:id"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminExpenseReviewPage />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

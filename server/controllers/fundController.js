@@ -4,6 +4,7 @@ import FundAllocation from '../models/FundAllocation.js';
 import RescueCase from '../models/RescueCase.js';
 import Donation from '../models/Donation.js';
 import AuditLog from '../models/AuditLog.js';
+import Expense from '../models/Expense.js';
 
 /**
  * Generate a unique allocation reference code
@@ -35,20 +36,26 @@ export const calculateCaseFinancials = async (caseId) => {
   const totalDonations = donationAgg.length > 0 ? donationAgg[0].total : 0;
   const donorCount = donationAgg.length > 0 ? donationAgg[0].count : 0;
 
-  // 2. Active Allocations (status != 'Cancelled')
-  const allocAgg = await FundAllocation.aggregate([
-    { $match: { rescueCase: caseObjId, status: { $ne: 'Cancelled' } } },
-    {
-      $group: {
-        _id: null,
-        totalAllocated: { $sum: '$amount' },
-        totalSpent: { $sum: '$amountSpent' },
-        allocCount: { $sum: 1 },
+    // 2. Active Allocations (status != 'Cancelled')
+    const allocAgg = await FundAllocation.aggregate([
+      { $match: { rescueCase: caseObjId, status: { $ne: 'Cancelled' } } },
+      {
+        $group: {
+          _id: null,
+          totalAllocated: { $sum: '$amount' },
+          totalSpent: { $sum: '$amountSpent' },
+          allocCount: { $sum: 1 },
+        },
       },
-    },
-  ]);
-  const totalAllocated = allocAgg.length > 0 ? allocAgg[0].totalAllocated : 0;
-  const totalVerifiedSpending = allocAgg.length > 0 ? allocAgg[0].totalSpent : 0;
+    ]);
+    const totalAllocated = allocAgg.length > 0 ? allocAgg[0].totalAllocated : 0;
+
+    // 3. Approved Expenses Sum (Module 8 verified spending)
+    const expenseAgg = await Expense.aggregate([
+      { $match: { rescueCase: caseObjId, verificationStatus: 'Approved' } },
+      { $group: { _id: null, totalSpent: { $sum: '$amount' }, count: { $sum: 1 } } },
+    ]);
+    const totalVerifiedSpending = expenseAgg.length > 0 ? expenseAgg[0].totalSpent : (allocAgg.length > 0 ? allocAgg[0].totalSpent : 0);
 
   const remainingAllocatedBalance = Math.max(0, totalAllocated - totalVerifiedSpending);
   const unallocatedFunds = Math.max(0, totalDonations - totalAllocated);
@@ -168,13 +175,21 @@ export const getTransparencyCases = async (req, res, next) => {
       RescueCase.countDocuments(filter),
     ]);
 
-    // Attach financial calculation to each case
+    // Attach financial calculation and sanitized approved expenses to each case
     const caseSummaries = await Promise.all(
       cases.map(async (c) => {
-        const financials = await calculateCaseFinancials(c._id);
+        const [financials, approvedExpenses] = await Promise.all([
+          calculateCaseFinancials(c._id),
+          Expense.find({ rescueCase: c._id, verificationStatus: 'Approved' })
+            .select('title expenseCategory amount expenseDate documentType')
+            .sort({ expenseDate: -1 })
+            .limit(5)
+            .lean(),
+        ]);
         return {
           ...c,
           financials,
+          approvedExpenses,
         };
       })
     );

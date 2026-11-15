@@ -6,6 +6,7 @@ import caseRoutes from './caseRoutes.js';
 import notificationRoutes from './notificationRoutes.js';
 import donationRoutes from './donationRoutes.js';
 import transparencyRoutes from './transparencyRoutes.js';
+import expenseRoutes from './expenseRoutes.js';
 
 const router = express.Router();
 
@@ -20,6 +21,9 @@ router.use('/cases', caseRoutes);
 
 // Donation endpoints (/api/donations)
 router.use('/donations', donationRoutes);
+
+// Expense endpoints (/api/expenses)
+router.use('/expenses', expenseRoutes);
 
 // Admin endpoints (/api/admin)
 router.use('/admin', adminRoutes);

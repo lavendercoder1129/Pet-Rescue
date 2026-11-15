@@ -7,14 +7,20 @@ import {
   AlertCircle,
   MapPin,
   Calendar,
+  AlertTriangle,
+  RotateCcw,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
-import { getMyCases } from '../../services/api';
+import { getMyCases, resubmitRescueCase } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import Container from '../../components/layout/Container';
 import Section from '../../components/layout/Section';
 import BaseCard from '../../components/cards/BaseCard';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import OutlineButton from '../../components/common/OutlineButton';
+import FormInput from '../../components/forms/FormInput';
+import FormTextarea from '../../components/forms/FormTextarea';
 import UrgencyBadge from '../../components/feedback/UrgencyBadge';
 import LoadingState from '../../components/feedback/LoadingState';
 import EmptyState from '../../components/feedback/EmptyState';
@@ -24,6 +30,22 @@ export const MyCasesPage = () => {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Resubmission modal state
+  const [resubmittingCase, setResubmittingCase] = useState(null);
+  const [resubmitFormData, setResubmitFormData] = useState({
+    title: '',
+    animalName: '',
+    location: '',
+    description: '',
+    injuryType: '',
+    injuryDescription: '',
+    medicalCondition: '',
+    estimatedTreatmentCost: '',
+    fundraisingGoal: '',
+  });
+  const [resubmitLoading, setResubmitLoading] = useState(false);
+  const [resubmitMessage, setResubmitMessage] = useState('');
 
   const isApproved = user?.role === 'admin' || user?.rescuerVerificationStatus === 'approved';
 
@@ -46,6 +68,41 @@ export const MyCasesPage = () => {
     fetchCases();
   }, []);
 
+  const openResubmitModal = (c) => {
+    setResubmittingCase(c);
+    setResubmitFormData({
+      title: c.title || '',
+      animalName: c.animalName || '',
+      location: c.location || '',
+      description: c.description || '',
+      injuryType: c.injuryType || '',
+      injuryDescription: c.injuryDescription || '',
+      medicalCondition: c.medicalCondition || '',
+      estimatedTreatmentCost: c.estimatedTreatmentCost || '',
+      fundraisingGoal: c.fundraisingGoal || '',
+    });
+    setResubmitMessage('');
+  };
+
+  const handleResubmit = async (e) => {
+    e.preventDefault();
+    if (!resubmittingCase) return;
+
+    try {
+      setResubmitLoading(true);
+      const res = await resubmitRescueCase(resubmittingCase._id, resubmitFormData);
+      setResubmitLoading(false);
+      if (res && res.success) {
+        setResubmittingCase(null);
+        setResubmitMessage('Case updated and successfully queued back for admin re-review.');
+        fetchCases();
+      }
+    } catch (err) {
+      setResubmitLoading(false);
+      alert(err.message || 'Failed to resubmit case.');
+    }
+  };
+
   return (
     <Section spacing="default" className="py-8 sm:py-12">
       <Container>
@@ -64,7 +121,7 @@ export const MyCasesPage = () => {
               My Rescue Cases
             </h1>
             <p className="text-xs text-charcoal-muted mt-1">
-              Track the verification status, administrative notes, and simulated crowdfunding of cases you have submitted.
+              Track verification status, review administrative feedback, and revise rejected cases for re-review.
             </p>
           </div>
 
@@ -80,6 +137,14 @@ export const MyCasesPage = () => {
             </Link>
           </div>
         </div>
+
+        {/* Global Action Message */}
+        {resubmitMessage && (
+          <div className="rounded-xl p-4 mb-6 bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0" />
+            <span>{resubmitMessage}</span>
+          </div>
+        )}
 
         {/* Unverified Rescuer Warning */}
         {!isApproved && (
@@ -136,8 +201,11 @@ export const MyCasesPage = () => {
                     : `http://localhost:5000${c.images[0]}`
                   : null;
 
+              const isRejected = c.verificationStatus === 'Rejected';
+              const isApprovedCase = c.verificationStatus === 'Approved';
+
               return (
-                <BaseCard key={c._id} padding="md" className="space-y-4 bg-white">
+                <BaseCard key={c._id} padding="md" className="space-y-4 bg-white shadow-warm-xs">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     {/* Left preview info */}
                     <div className="flex items-start gap-4">
@@ -158,13 +226,15 @@ export const MyCasesPage = () => {
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <UrgencyBadge level={c.urgencyLevel.toLowerCase()} />
-                          <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase ${
-                            c.verificationStatus === 'Approved'
-                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                              : c.verificationStatus === 'Rejected'
-                              ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                              : 'bg-amber-50 text-amber-800 border border-amber-200'
-                          }`}>
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase ${
+                              isApprovedCase
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                : isRejected
+                                ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                : 'bg-amber-50 text-amber-800 border border-amber-200'
+                            }`}
+                          >
                             Verification: {c.verificationStatus}
                           </span>
                         </div>
@@ -181,13 +251,21 @@ export const MyCasesPage = () => {
                           <span>•</span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3.5 h-3.5 text-sage-dark" />
-                            Submitted {new Date(c.createdAt).toLocaleDateString()}
+                            Submitted: {new Date(c.createdAt).toLocaleDateString()}
                           </span>
+                          {c.reviewedAt && (
+                            <>
+                              <span>•</span>
+                              <span className="flex items-center gap-1 font-mono text-[11px]">
+                                Reviewed: {new Date(c.reviewedAt).toLocaleDateString()}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Right financial & action */}
+                    {/* Right financial & actions */}
                     <div className="flex md:flex-col items-center md:items-end justify-between gap-2 border-t md:border-t-0 pt-3 md:pt-0 border-grey-light">
                       <div className="text-right">
                         <span className="text-xs text-charcoal-muted block">Simulated Goal</span>
@@ -196,33 +274,190 @@ export const MyCasesPage = () => {
                         </span>
                       </div>
 
-                      {c.verificationStatus === 'Approved' ? (
-                        <Link to={`/cases/${c._id}`}>
-                          <OutlineButton size="sm" icon={Eye}>
-                            View Public Page
-                          </OutlineButton>
-                        </Link>
-                      ) : (
-                        <span className="text-[11px] text-charcoal-muted italic">
-                          {c.verificationStatus === 'Pending' ? 'In Admin Queue' : 'Rejected by Admin'}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {isApprovedCase ? (
+                          <Link to={`/cases/${c._id}`}>
+                            <OutlineButton size="sm" icon={Eye}>
+                              View Public Page
+                            </OutlineButton>
+                          </Link>
+                        ) : isRejected ? (
+                          <PrimaryButton
+                            size="sm"
+                            icon={RotateCcw}
+                            className="bg-forest text-xs"
+                            onClick={() => openResubmitModal(c)}
+                          >
+                            Revise & Resubmit
+                          </PrimaryButton>
+                        ) : (
+                          <span className="text-[11px] text-amber-800 bg-amber-50 px-2 py-1 rounded-md border border-amber-200 font-medium">
+                            In Admin Verification Queue
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Admin review note if available */}
-                  {c.reviewNote && (
-                    <div className={`p-3 rounded-xl text-xs ${
-                      c.verificationStatus === 'Approved'
-                        ? 'bg-emerald-50/80 border border-emerald-200 text-emerald-900'
-                        : 'bg-rose-50/80 border border-rose-200 text-rose-900'
-                    }`}>
-                      <strong>Admin Review Note:</strong> {c.reviewNote}
+                  {/* Admin review note & rejection feedback */}
+                  {(c.reviewNote || c.rejectionReason) && (
+                    <div
+                      className={`p-3.5 rounded-xl text-xs space-y-1 ${
+                        isApprovedCase
+                          ? 'bg-emerald-50/80 border border-emerald-200 text-emerald-900'
+                          : 'bg-rose-50/80 border border-rose-200 text-rose-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-semibold">
+                        {isApprovedCase ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                        ) : (
+                          <AlertTriangle className="w-4 h-4 text-rose-700" />
+                        )}
+                        <span>
+                          {isApprovedCase ? 'Admin Review Note:' : 'Rejection Reason & Required Corrections:'}
+                        </span>
+                      </div>
+                      <p className="leading-relaxed pl-5 font-sans">
+                        {c.rejectionReason || c.reviewNote}
+                      </p>
+                      {isRejected && (
+                        <p className="text-[11px] text-rose-800 font-medium pl-5 pt-1">
+                          Action Required: Click "Revise & Resubmit" to update the medical diagnosis, missing photographs, or treatment estimate to return this case for review.
+                        </p>
+                      )}
                     </div>
                   )}
                 </BaseCard>
               );
             })}
+          </div>
+        )}
+
+        {/* Resubmission Modal */}
+        {resubmittingCase && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-warm border border-grey-light space-y-4 font-sans my-8">
+              <div className="flex items-center justify-between border-b border-grey-light pb-3">
+                <div className="flex items-center gap-2">
+                  <RotateCcw className="w-5 h-5 text-forest" />
+                  <h3 className="font-serif text-lg font-bold text-forest">
+                    Revise & Resubmit Case
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setResubmittingCase(null)}
+                  className="p-1 rounded-lg hover:bg-grey-light text-charcoal-muted"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Display original rejection reason as guidance */}
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900">
+                <strong>Admin Rejection Feedback:</strong>
+                <p className="mt-1">{resubmittingCase.rejectionReason || resubmittingCase.reviewNote}</p>
+              </div>
+
+              <form onSubmit={handleResubmit} className="space-y-4 text-xs">
+                <FormInput
+                  label="Case Title"
+                  value={resubmitFormData.title}
+                  onChange={(e) =>
+                    setResubmitFormData({ ...resubmitFormData, title: e.target.value })
+                  }
+                  required
+                />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormInput
+                    label="Animal Name"
+                    value={resubmitFormData.animalName}
+                    onChange={(e) =>
+                      setResubmitFormData({ ...resubmitFormData, animalName: e.target.value })
+                    }
+                    required
+                  />
+                  <FormInput
+                    label="Location & Landmark"
+                    value={resubmitFormData.location}
+                    onChange={(e) =>
+                      setResubmitFormData({ ...resubmitFormData, location: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormInput
+                    label="Estimated Treatment Cost (₹)"
+                    type="number"
+                    value={resubmitFormData.estimatedTreatmentCost}
+                    onChange={(e) =>
+                      setResubmitFormData({
+                        ...resubmitFormData,
+                        estimatedTreatmentCost: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                  <FormInput
+                    label="Fundraising Goal (₹)"
+                    type="number"
+                    value={resubmitFormData.fundraisingGoal}
+                    onChange={(e) =>
+                      setResubmitFormData({ ...resubmitFormData, fundraisingGoal: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <FormTextarea
+                  label="Trauma & Injury Description"
+                  rows={2}
+                  value={resubmitFormData.injuryDescription}
+                  onChange={(e) =>
+                    setResubmitFormData({
+                      ...resubmitFormData,
+                      injuryDescription: e.target.value,
+                    })
+                  }
+                  required
+                />
+
+                <FormTextarea
+                  label="Attending Clinic & Medical Condition"
+                  rows={2}
+                  value={resubmitFormData.medicalCondition}
+                  onChange={(e) =>
+                    setResubmitFormData({
+                      ...resubmitFormData,
+                      medicalCondition: e.target.value,
+                    })
+                  }
+                  required
+                />
+
+                <p className="text-[11px] text-charcoal-muted leading-relaxed">
+                  Submitting will return this case to <strong>Pending</strong> status in the admin review queue and log your updates in the append-only audit trail. You cannot change verification status directly.
+                </p>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-grey-light">
+                  <OutlineButton
+                    size="sm"
+                    type="button"
+                    onClick={() => setResubmittingCase(null)}
+                    disabled={resubmitLoading}
+                  >
+                    Cancel
+                  </OutlineButton>
+                  <PrimaryButton size="sm" type="submit" isLoading={resubmitLoading}>
+                    Resubmit for Verification
+                  </PrimaryButton>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </Container>

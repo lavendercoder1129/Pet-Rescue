@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Container from './Container';
+import NotificationDropdown from '../feedback/NotificationDropdown';
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -93,6 +94,9 @@ export const Navbar = () => {
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
+                {/* In-app Notification Bell */}
+                <NotificationDropdown />
+
                 {/* User badge with role */}
                 <Link
                   to={getDashboardPath()}

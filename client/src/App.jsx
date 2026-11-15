@@ -43,6 +43,11 @@ import AdminRescueUpdatesPage from './pages/admin/AdminRescueUpdatesPage';
 import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 
+// Donor Recognition, Leaderboards & Achievement Badges (Module 10)
+import DonorAchievementsPage from './pages/donor/DonorAchievementsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
+import AdminAchievementsPage from './pages/admin/AdminAchievementsPage';
+
 // Route Protection
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
@@ -61,6 +66,7 @@ export function App() {
             <Route path="how-it-works" element={<HowItWorksPage />} />
             <Route path="transparency" element={<TransparencyPage />} />
             <Route path="donor-wall" element={<DonorWallPage />} />
+            <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="announcements" element={<AnnouncementsPage />} />
             <Route path="design-system" element={<DesignSystemPage />} />
 
@@ -81,6 +87,18 @@ export function App() {
               element={
                 <ProtectedRoute>
                   <DonorDonationsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Donor Achievements & Recognition (Module 10) */}
+            <Route
+              path="donor/achievements"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['donor', 'admin']}>
+                    <DonorAchievementsPage />
+                  </RoleProtectedRoute>
                 </ProtectedRoute>
               }
             />
@@ -291,6 +309,18 @@ export function App() {
                 <ProtectedRoute>
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <AdminAnnouncementsPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Achievements Management (Module 10) */}
+            <Route
+              path="admin/achievements"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminAchievementsPage />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

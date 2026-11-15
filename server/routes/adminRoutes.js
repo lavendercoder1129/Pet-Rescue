@@ -31,6 +31,12 @@ import {
   approveRescueUpdate,
   rejectRescueUpdate,
 } from '../controllers/rescueUpdateController.js';
+import {
+  getAdminAchievements,
+  createAdminAchievement,
+  updateAdminAchievement,
+  toggleAdminAchievementStatus,
+} from '../controllers/achievementController.js';
 
 const router = express.Router();
 
@@ -149,5 +155,13 @@ router.patch('/expenses/:id/reject', verifyAuth, requireRoles('admin'), rejectEx
 router.get('/rescue-updates', verifyAuth, requireRoles('admin'), getAdminRescueUpdates);
 router.patch('/rescue-updates/:id/approve', verifyAuth, requireRoles('admin'), approveRescueUpdate);
 router.patch('/rescue-updates/:id/reject', verifyAuth, requireRoles('admin'), rejectRescueUpdate);
+
+/**
+ * Admin Achievements & Badges Endpoints under /api/admin/achievements
+ */
+router.get('/achievements', verifyAuth, requireRoles('admin'), getAdminAchievements);
+router.post('/achievements', verifyAuth, requireRoles('admin'), createAdminAchievement);
+router.patch('/achievements/:id', verifyAuth, requireRoles('admin'), updateAdminAchievement);
+router.patch('/achievements/:id/status', verifyAuth, requireRoles('admin'), toggleAdminAchievementStatus);
 
 export default router;

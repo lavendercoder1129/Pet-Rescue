@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Donation from '../models/Donation.js';
 import RescueCase from '../models/RescueCase.js';
 import Notification from '../models/Notification.js';
+import { evaluateUserAchievements } from '../services/achievementService.js';
 
 /**
  * Generate a unique, professional simulated donation reference
@@ -199,6 +200,11 @@ export const createDonation = async (req, res, next) => {
         caseId: rescueCase._id,
       }).catch(() => {});
     }
+
+    // 8. Evaluate Achievement Badges (Module 10) asynchronously without blocking transaction
+    evaluateUserAchievements(user._id).catch((achErr) => {
+      console.error('[Donation] Error evaluating achievements:', achErr);
+    });
 
     // Populate for response
     const populatedDonation = await Donation.findById(createdDonation._id)

@@ -50,6 +50,23 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    // Donor Recognition & Public Leaderboard Privacy Settings (Module 10)
+    recognitionSettings: {
+      showOnLeaderboard: {
+        type: Boolean,
+        default: false,
+      },
+      displayName: {
+        type: String,
+        trim: true,
+        maxlength: [50, 'Display name cannot exceed 50 characters'],
+        default: '',
+      },
+      showDonationTotal: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
   {
     timestamps: true,

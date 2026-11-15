@@ -345,4 +345,52 @@ export const archiveAnnouncement = async (id) => {
   return response.data;
 };
 
+/**
+ * Achievements & Donor Recognition Endpoints (Module 10)
+ */
+export const getAvailableAchievements = async () => {
+  const response = await api.get('/achievements');
+  return response.data;
+};
+
+export const getMyAchievements = async () => {
+  const response = await api.get('/achievements/my');
+  return response.data;
+};
+
+export const getPublicLeaderboard = async (params = {}) => {
+  const response = await api.get('/donors/leaderboard', { params });
+  return response.data;
+};
+
+export const getRecognitionSettings = async () => {
+  const response = await api.get('/donors/recognition-settings');
+  return response.data;
+};
+
+export const updateRecognitionSettings = async (settings) => {
+  const response = await api.patch('/donors/recognition-settings', settings);
+  return response.data;
+};
+
+export const getAdminAchievements = async () => {
+  const response = await api.get('/admin/achievements');
+  return response.data;
+};
+
+export const createAdminAchievement = async (data) => {
+  const response = await api.post('/admin/achievements', data);
+  return response.data;
+};
+
+export const updateAdminAchievement = async (id, data) => {
+  const response = await api.patch(`/admin/achievements/${id}`, data);
+  return response.data;
+};
+
+export const toggleAdminAchievementStatus = async (id, isActive) => {
+  const response = await api.patch(`/admin/achievements/${id}/status`, { isActive });
+  return response.data;
+};
+
 export default api;

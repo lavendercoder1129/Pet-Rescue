@@ -165,7 +165,41 @@ npm run build
 - [x] **Module 7: Fund Allocation & Financial Transparency Dashboard** (Completed)
 - [x] **Module 8: Expense Proof Upload & Admin Verification** (Completed)
 - [x] **Module 9: Rescue Updates & Emergency Announcements** (Completed)
-- [ ] **Module 10: Donor Recognition, Leaderboards & Achievement Badges** (Next)
+- [x] **Module 10: Donor Recognition, Leaderboards & Achievement Badges** (Completed)
+- [ ] **Module 11: Role-Based Dashboard Integration & Final UI Polish** (Next)
+
+---
+
+## 🏆 Module 10: Donor Recognition, Leaderboards & Achievement Badges
+
+### Features
+1. **Achievement & Badge System**:
+   - Automated, idempotent evaluation of donor milestones upon successful simulated donation events.
+   - Built-in achievement badges:
+     - `First Contribution`: Awarded upon first successful simulated donation.
+     - `Helping Hand`: Awarded after 3 simulated donations.
+     - `Compassion Champion`: Awarded after 5 simulated donations.
+     - `Animal Advocate`: Awarded after 10 simulated donations.
+     - `Consistent Supporter`: Awarded when contributing across 3 distinct calendar months.
+     - `Rescue Supporter`: Awarded when supporting 3 different rescue cases.
+   - Compound unique database constraints (`{ userId, achievementId }`) guarantee that duplicate contributions cannot award duplicate badges.
+2. **Opt-In Public Leaderboard (`/leaderboard`)**:
+   - Donors are excluded from the public leaderboard by default (`showOnLeaderboard: false`).
+   - Donors can opt in, customize an alias/display name, and optionally toggle visibility for their total contribution (`showDonationTotal: false` by default).
+   - Strict privacy safeguards: email addresses, phone numbers, and payment details are never exposed.
+   - Deterministic ranking: `donationCount` DESC $\rightarrow$ `uniqueCasesCount` DESC $\rightarrow$ `badgesCount` DESC $\rightarrow$ `_id` ASC.
+   - Supports paginated views and prominent academic simulation disclaimers.
+3. **Donor Achievement Showcase & Privacy Settings**:
+   - Dedicated route at `/donor/achievements` displaying unlocked badges, locked badge progress percentages, and tier milestones.
+   - Inline privacy preference controls within `/donor/dashboard` allowing donors to toggle public visibility with instant effect.
+4. **Administrative Badge Management (`/admin/achievements`)**:
+   - Administrators can review all badge definitions, active states, and recipient distribution counts.
+   - Modal interface to create custom badges, update descriptions, and toggle active status.
+
+### Running Module 10 Tests
+```bash
+node server/scripts/testModule10.js
+```
 
 ---
 

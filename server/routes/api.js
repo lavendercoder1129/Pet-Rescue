@@ -9,6 +9,8 @@ import transparencyRoutes from './transparencyRoutes.js';
 import expenseRoutes from './expenseRoutes.js';
 import rescueUpdateRoutes from './rescueUpdateRoutes.js';
 import announcementRoutes from './announcementRoutes.js';
+import achievementRoutes from './achievementRoutes.js';
+import donorRoutes from './donorRoutes.js';
 
 const router = express.Router();
 
@@ -32,6 +34,12 @@ router.use('/rescue-updates', rescueUpdateRoutes);
 
 // Announcements endpoints (/api/announcements)
 router.use('/announcements', announcementRoutes);
+
+// Achievement endpoints (/api/achievements)
+router.use('/achievements', achievementRoutes);
+
+// Donor Recognition & Public Leaderboard endpoints (/api/donors)
+router.use('/donors', donorRoutes);
 
 // Admin endpoints (/api/admin)
 router.use('/admin', adminRoutes);

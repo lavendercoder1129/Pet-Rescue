@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw, ClipboardCheck, Receipt, Sparkles, Megaphone } from 'lucide-react';
+import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw, ClipboardCheck, Receipt, Sparkles, Megaphone, Award } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import Container from '../../components/layout/Container';
@@ -82,6 +82,11 @@ export const AdminDashboard = () => {
             <Link to="/admin/announcements">
               <OutlineButton size="sm" icon={Megaphone}>
                 Announcements
+              </OutlineButton>
+            </Link>
+            <Link to="/admin/achievements">
+              <OutlineButton size="sm" icon={Award}>
+                Badges & Achievements
               </OutlineButton>
             </Link>
             <Link to="/admin/expenses">

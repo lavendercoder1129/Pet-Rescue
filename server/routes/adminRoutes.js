@@ -2,6 +2,13 @@ import express from 'express';
 import { verifyAuth } from '../middleware/authMiddleware.js';
 import { requireRoles } from '../middleware/roleMiddleware.js';
 import User from '../models/User.js';
+import RescueCase from '../models/RescueCase.js';
+import Donation from '../models/Donation.js';
+import FundAllocation from '../models/FundAllocation.js';
+import Expense from '../models/Expense.js';
+import RescueUpdate from '../models/RescueUpdate.js';
+import Announcement from '../models/Announcement.js';
+import Achievement from '../models/Achievement.js';
 import {
   getAdminCases,
   getAdminCaseStats,
@@ -42,28 +49,105 @@ const router = express.Router();
 
 /**
  * @route   GET /api/admin/dashboard
- * @desc    Admin metrics & overview
+ * @desc    Comprehensive Admin metrics & module summaries
  * @access  Private (Admin only)
  */
 router.get('/dashboard', verifyAuth, requireRoles('admin'), async (req, res) => {
-  const totalUsers = await User.countDocuments();
-  const totalRescuers = await User.countDocuments({ role: 'rescuer' });
-  const pendingRescuers = await User.countDocuments({
-    role: 'rescuer',
-    rescuerVerificationStatus: 'pending',
-  });
-  const totalDonors = await User.countDocuments({ role: 'donor' });
-
-  res.status(200).json({
-    success: true,
-    message: 'Welcome to Admin Dashboard',
-    stats: {
+  try {
+    const [
       totalUsers,
       totalDonors,
       totalRescuers,
       pendingRescuers,
-    },
-  });
+      verifiedRescuers,
+      rejectedRescuers,
+      pendingCases,
+      approvedCases,
+      rejectedCases,
+      activeCases,
+      resolvedCases,
+      totalCases,
+      donationStats,
+      allocationStats,
+      expenseStats,
+      pendingExpenses,
+      approvedExpenses,
+      rejectedExpenses,
+      pendingUpdates,
+      publishedUpdates,
+      announcementsCount,
+      achievementsCount,
+    ] = await Promise.all([
+      User.countDocuments(),
+      User.countDocuments({ role: 'donor' }),
+      User.countDocuments({ role: 'rescuer' }),
+      User.countDocuments({ role: 'rescuer', rescuerVerificationStatus: 'pending' }),
+      User.countDocuments({ role: 'rescuer', rescuerVerificationStatus: 'approved' }),
+      User.countDocuments({ role: 'rescuer', rescuerVerificationStatus: 'rejected' }),
+      RescueCase.countDocuments({ verificationStatus: 'Pending' }),
+      RescueCase.countDocuments({ verificationStatus: 'Approved' }),
+      RescueCase.countDocuments({ verificationStatus: 'Rejected' }),
+      RescueCase.countDocuments({ verificationStatus: 'Approved', campaignStatus: 'Active' }),
+      RescueCase.countDocuments({ campaignStatus: { $in: ['Resolved', 'Closed'] } }),
+      RescueCase.countDocuments(),
+      Donation.aggregate([
+        { $match: { isSimulated: true, transactionStatus: 'Simulated' } },
+        { $group: { _id: null, totalSimulatedDonations: { $sum: '$amount' }, count: { $sum: 1 } } },
+      ]),
+      FundAllocation.aggregate([
+        { $match: { isSimulated: true, status: { $ne: 'Cancelled' } } },
+        { $group: { _id: null, totalAllocatedFunds: { $sum: '$amount' }, totalSpent: { $sum: '$amountSpent' } } },
+      ]),
+      Expense.aggregate([
+        { $match: { isSimulated: true, verificationStatus: 'Approved' } },
+        { $group: { _id: null, totalApprovedExpenses: { $sum: '$amount' }, count: { $sum: 1 } } },
+      ]),
+      Expense.countDocuments({ verificationStatus: 'Pending' }),
+      Expense.countDocuments({ verificationStatus: 'Approved' }),
+      Expense.countDocuments({ verificationStatus: 'Rejected' }),
+      RescueUpdate.countDocuments({ status: 'pending' }),
+      RescueUpdate.countDocuments({ status: 'published' }),
+      Announcement.countDocuments(),
+      Achievement.countDocuments(),
+    ]);
+
+    const totalSimulatedDonations = donationStats[0]?.totalSimulatedDonations || 0;
+    const totalDonationsCount = donationStats[0]?.count || 0;
+    const totalAllocatedFunds = allocationStats[0]?.totalAllocatedFunds || 0;
+    const totalApprovedExpenses = expenseStats[0]?.totalApprovedExpenses || 0;
+
+    res.status(200).json({
+      success: true,
+      message: 'Welcome to Admin Dashboard',
+      stats: {
+        totalUsers,
+        totalDonors,
+        totalRescuers,
+        pendingRescuers,
+        verifiedRescuers,
+        rejectedRescuers,
+        pendingCases,
+        approvedCases,
+        rejectedCases,
+        activeCases,
+        resolvedCases,
+        totalCases,
+        totalSimulatedDonations,
+        totalDonationsCount,
+        totalAllocatedFunds,
+        totalApprovedExpenses,
+        pendingExpenses,
+        approvedExpenses,
+        rejectedExpenses,
+        pendingUpdates,
+        publishedUpdates,
+        announcementsCount,
+        achievementsCount,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 /**

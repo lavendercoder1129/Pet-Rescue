@@ -1,0 +1,96 @@
+name: Quality Checks & Automated CI
+
+on:
+  push:
+    branches: [main, 'feature/**', 'fix/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-checks:
+    name: Backend Tests & Validation
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install Backend Dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Seed Admin & Initial Data
+        working-directory: server
+        env:
+          MONGODB_URI: mongodb://localhost:27017/pet_rescue
+          JWT_SECRET: ci_secret_key_testing_jwt_token_32_chars
+        run: |
+          node scripts/createAdmin.js || true
+          node scripts/seedAchievements.js || true
+
+      - name: Start Backend Server
+        working-directory: server
+        env:
+          PORT: 5000
+          MONGODB_URI: mongodb://localhost:27017/pet_rescue
+          JWT_SECRET: ci_secret_key_testing_jwt_token_32_chars
+          CLIENT_URL: http://localhost:5173
+        run: node server.js & sleep 3
+
+      - name: Run Backend Test Suites
+        working-directory: server
+        env:
+          MONGODB_URI: mongodb://localhost:27017/pet_rescue
+          JWT_SECRET: ci_secret_key_testing_jwt_token_32_chars
+        run: |
+          node scripts/testAuth.js
+          node scripts/testCases.js
+          node scripts/testModule5.js
+          node scripts/testModule6.js
+          node scripts/testModule7.js
+          node scripts/testModule8.js
+          node scripts/testModule9.js
+          node scripts/testModule10.js
+          node scripts/testModule11.js
+
+  frontend-checks:
+    name: Frontend Lint & Production Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Run ESLint Quality Check
+        working-directory: client
+        run: npx eslint . --quiet
+
+      - name: Build Production Bundle
+        working-directory: client
+        env:
+          VITE_API_URL: https://api.petrescue.example/api
+        run: npm run build

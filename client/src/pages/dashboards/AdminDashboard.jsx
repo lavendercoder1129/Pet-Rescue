@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw, ClipboardCheck, Receipt } from 'lucide-react';
+import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw, ClipboardCheck, Receipt, Sparkles, Megaphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import Container from '../../components/layout/Container';
@@ -68,11 +68,21 @@ export const AdminDashboard = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <Link to="/admin/funds">
               <PrimaryButton size="sm">
                 Fund Allocations
               </PrimaryButton>
+            </Link>
+            <Link to="/admin/rescue-updates">
+              <OutlineButton size="sm" icon={Sparkles}>
+                Updates Moderation
+              </OutlineButton>
+            </Link>
+            <Link to="/admin/announcements">
+              <OutlineButton size="sm" icon={Megaphone}>
+                Announcements
+              </OutlineButton>
             </Link>
             <Link to="/admin/expenses">
               <OutlineButton size="sm" icon={Receipt}>

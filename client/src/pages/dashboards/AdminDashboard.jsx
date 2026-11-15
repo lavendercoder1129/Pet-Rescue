@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShieldCheck, LogOut, Users, UserCheck, ShieldAlert, RefreshCw, ClipboardCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import Container from '../../components/layout/Container';
 import Section from '../../components/layout/Section';
 import BaseCard from '../../components/cards/BaseCard';
 import StatCard from '../../components/cards/StatCard';
+import PrimaryButton from '../../components/common/PrimaryButton';
 import OutlineButton from '../../components/common/OutlineButton';
 import StatusBadge from '../../components/feedback/StatusBadge';
 
@@ -67,6 +69,11 @@ export const AdminDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link to="/admin/cases">
+              <PrimaryButton size="sm" icon={ClipboardCheck}>
+                Review Emergency Cases
+              </PrimaryButton>
+            </Link>
             <OutlineButton size="sm" icon={RefreshCw} onClick={fetchAdminData}>
               Refresh Data
             </OutlineButton>

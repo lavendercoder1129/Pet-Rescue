@@ -1,4 +1,5 @@
-import { ShieldAlert, LogOut, PlusCircle, AlertCircle, Clock, FileCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShieldAlert, LogOut, PlusCircle, AlertCircle, Clock, FileCheck, FolderHeart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Container from '../../components/layout/Container';
 import Section from '../../components/layout/Section';
@@ -10,7 +11,7 @@ import StatusBadge from '../../components/feedback/StatusBadge';
 
 export const RescuerDashboard = () => {
   const { user, logout } = useAuth();
-  const isVerified = user?.rescuerVerificationStatus === 'approved';
+  const isVerified = user?.role === 'admin' || user?.rescuerVerificationStatus === 'approved';
 
   return (
     <Section spacing="default">
@@ -36,6 +37,11 @@ export const RescuerDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link to="/rescuer/cases">
+              <OutlineButton size="sm" icon={FolderHeart}>
+                My Submissions
+              </OutlineButton>
+            </Link>
             <OutlineButton size="sm" icon={LogOut} onClick={logout}>
               Log Out
             </OutlineButton>
@@ -52,9 +58,6 @@ export const RescuerDashboard = () => {
               </strong>
               <p className="leading-relaxed">
                 As a safety guardrail for animal welfare and donor funds, new Rescuer accounts must be reviewed by platform administrators before live rescue cases can be published.
-              </p>
-              <p className="text-amber-800/80 text-[11px]">
-                Full emergency case creation and clinic slip verification workflows will be unlocked in Module 4.
               </p>
             </div>
           </div>
@@ -76,8 +79,8 @@ export const RescuerDashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           <StatCard
             title="My Rescue Reports"
-            value="0"
-            subtitle="Published cases"
+            value="Active"
+            subtitle="Access case submissions"
             colorScheme="forest"
             icon={ShieldAlert}
           />
@@ -90,21 +93,21 @@ export const RescuerDashboard = () => {
           />
           <StatCard
             title="Funds Disbursed"
-            value="₹0"
+            value="Simulated"
             subtitle="Against verified bills"
             colorScheme="sage"
             icon={FileCheck}
           />
           <StatCard
-            title="Assigned Clinic"
-            value="Unassigned"
-            subtitle="Local trauma center"
+            title="Assigned Sector"
+            value="Indiranagar"
+            subtitle="Local trauma response"
             colorScheme="charcoal"
             icon={ShieldAlert}
           />
         </div>
 
-        {/* Action and Case Management Placeholder */}
+        {/* Action and Case Management Navigation */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <BaseCard padding="lg" className="space-y-4">
             <h3 className="font-serif text-xl font-bold text-forest">
@@ -113,21 +116,24 @@ export const RescuerDashboard = () => {
             <p className="text-xs text-charcoal-muted leading-relaxed font-sans">
               Create an emergency case with GPS landmark, injury photos, admitting clinic contact, and preliminary veterinary surgery estimates.
             </p>
-            <div className="pt-2">
-              <PrimaryButton
-                size="sm"
-                icon={PlusCircle}
-                disabled={!isVerified}
-                onClick={() =>
-                  alert(
-                    isVerified
-                      ? 'Case submission form will be fully implemented in Module 4.'
-                      : 'You cannot publish cases while your rescuer account is in Pending status.'
-                  )
-                }
-              >
-                {isVerified ? 'Create Rescue Case' : 'Pending Verification Required'}
-              </PrimaryButton>
+            <div className="pt-2 flex items-center gap-3">
+              {isVerified ? (
+                <Link to="/rescuer/cases/new">
+                  <PrimaryButton size="sm" icon={PlusCircle}>
+                    Create Rescue Case
+                  </PrimaryButton>
+                </Link>
+              ) : (
+                <PrimaryButton size="sm" icon={PlusCircle} disabled>
+                  Pending Verification Required
+                </PrimaryButton>
+              )}
+
+              <Link to="/rescuer/cases">
+                <OutlineButton size="sm">
+                  View My Cases
+                </OutlineButton>
+              </Link>
             </div>
           </BaseCard>
 

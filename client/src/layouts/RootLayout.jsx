@@ -1,11 +1,11 @@
 import { Outlet } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
 
 export const RootLayout = () => {
   return (
     <div className="min-h-screen flex flex-col bg-ivory text-charcoal">
-      <Header />
+      <Navbar />
       <main className="flex-1">
         <Outlet />
       </main>

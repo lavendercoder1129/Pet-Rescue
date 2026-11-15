@@ -34,14 +34,20 @@ export default {
           soft: '#3D4440',
           muted: '#636B66',
         },
+        grey: {
+          light: '#E9E8E2',
+          border: '#E9E8E2',
+        },
       },
       fontFamily: {
         serif: ['"Playfair Display"', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       boxShadow: {
+        'warm-sm': '0 1px 3px 0 rgba(37, 42, 39, 0.04), 0 1px 2px -1px rgba(37, 42, 39, 0.04)',
         'warm': '0 4px 20px -2px rgba(37, 42, 39, 0.05), 0 2px 6px -1px rgba(37, 42, 39, 0.03)',
-        'warm-lg': '0 10px 30px -4px rgba(37, 42, 39, 0.08), 0 4px 12px -2px rgba(37, 42, 39, 0.04)',
+        'warm-md': '0 8px 24px -4px rgba(37, 42, 39, 0.07), 0 3px 8px -2px rgba(37, 42, 39, 0.03)',
+        'warm-lg': '0 12px 32px -4px rgba(37, 42, 39, 0.09), 0 4px 12px -2px rgba(37, 42, 39, 0.04)',
       },
     },
   },

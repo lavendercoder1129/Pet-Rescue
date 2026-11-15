@@ -1,0 +1,37 @@
+:root {
+  /* Color Tokens - Modern Compassionate Editorial */
+  --color-forest: #244C3A;
+  --color-forest-deep: #1B382B;
+  --color-forest-light: #2E614A;
+  --color-forest-subtle: #E9EFEA;
+
+  --color-sage: #A8B9A0;
+  --color-sage-dark: #879A7E;
+  --color-sage-light: #C4D1BF;
+  --color-sage-wash: #EFF4ED;
+
+  --color-ivory: #FAF8F2;
+  --color-ivory-warm: #F4EFE6;
+  --color-ivory-border: #E8E2D5;
+
+  --color-orange-muted: #D98B54;
+  --color-orange-hover: #C47741;
+  --color-orange-subtle: #FAF0E7;
+
+  --color-charcoal: #252A27;
+  --color-charcoal-soft: #3D4440;
+  --color-charcoal-muted: #636B66;
+
+  --color-white: #FFFFFF;
+  --color-grey-light: #E9E8E2;
+
+  /* Typography Scale */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Spacing Scale */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}

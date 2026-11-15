@@ -13,6 +13,7 @@ import {
   Download,
   Building2,
   Lock,
+  Eye,
 } from 'lucide-react';
 import {
   getAdminExpenseById,

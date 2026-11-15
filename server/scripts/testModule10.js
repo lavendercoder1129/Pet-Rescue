@@ -57,11 +57,32 @@ const runModule10Tests = async () => {
   try {
     // 1. Setup test users
     console.log('\n--- Setting up test users and cases ---');
-    const adminUser = await User.findOne({ role: 'admin' });
-    const rescuerUser = await User.findOne({ role: 'rescuer' });
+    let adminUser = await User.findOne({ role: 'admin' });
+    if (!adminUser) {
+      const passwordHash = await User.hashPassword(process.env.ADMIN_PASSWORD || 'AdminPass2026!');
+      adminUser = await User.create({
+        name: 'System Administrator',
+        email: 'admin@petrescue.example',
+        phone: '+91 98000 00000',
+        passwordHash,
+        role: 'admin',
+        rescuerVerificationStatus: 'not_applicable',
+        isActive: true,
+      });
+    }
 
-    if (!adminUser || !rescuerUser) {
-      throw new Error('Admin or Rescuer user not found. Ensure previous modules were seeded.');
+    let rescuerUser = await User.findOne({ role: 'rescuer' });
+    if (!rescuerUser) {
+      const passwordHash = await User.hashPassword('RescuerPass2026!');
+      rescuerUser = await User.create({
+        name: 'Priya Sundaram (Lead Rescuer)',
+        email: 'seed_rescuer@petrescue.example',
+        phone: '+91 98450 12345',
+        passwordHash,
+        role: 'rescuer',
+        rescuerVerificationStatus: 'approved',
+        isActive: true,
+      });
     }
 
     // Login Admin

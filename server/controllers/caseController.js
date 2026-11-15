@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import RescueCase from '../models/RescueCase.js';
 import AuditLog from '../models/AuditLog.js';
 import Notification from '../models/Notification.js';
+import { calculateCaseFinancials } from './fundController.js';
 
 /**
  * @route   GET /api/cases
@@ -131,9 +132,15 @@ export const getPublicCaseById = async (req, res, next) => {
       });
     }
 
+    // Calculate real-time fund transparency breakdown
+    const financials = await calculateCaseFinancials(rescueCase._id);
+
     res.status(200).json({
       success: true,
-      case: rescueCase,
+      case: {
+        ...rescueCase,
+        financials,
+      },
     });
   } catch (error) {
     next(error);

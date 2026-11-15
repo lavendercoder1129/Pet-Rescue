@@ -170,6 +170,39 @@ export const getAdminDonationStats = async () => {
 };
 
 /**
+ * Transparency & Fund Allocation Endpoints
+ */
+export const getTransparencySummary = async () => {
+  const response = await api.get('/transparency/summary');
+  return response.data;
+};
+
+export const getTransparencyCases = async (params = {}) => {
+  const response = await api.get('/transparency/cases', { params });
+  return response.data;
+};
+
+export const getAdminFundsSummary = async () => {
+  const response = await api.get('/admin/funds/summary');
+  return response.data;
+};
+
+export const getAdminAllocations = async (params = {}) => {
+  const response = await api.get('/admin/funds/allocations', { params });
+  return response.data;
+};
+
+export const createFundAllocation = async (allocationData) => {
+  const response = await api.post('/admin/funds/allocations', allocationData);
+  return response.data;
+};
+
+export const getAdminCaseFinancials = async (caseId) => {
+  const response = await api.get(`/admin/funds/cases/${caseId}`);
+  return response.data;
+};
+
+/**
  * Notifications Endpoints
  */
 export const getNotifications = async () => {

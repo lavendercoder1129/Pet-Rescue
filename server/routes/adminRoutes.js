@@ -14,6 +14,12 @@ import {
   getAdminDonations,
   getAdminDonationStats,
 } from '../controllers/donationController.js';
+import {
+  getAdminFundsSummary,
+  getAdminAllocations,
+  createFundAllocation,
+  getAdminCaseFinancials,
+} from '../controllers/fundController.js';
 
 const router = express.Router();
 
@@ -109,5 +115,13 @@ router.patch('/cases/:id/reject', verifyAuth, requireRoles('admin'), rejectCase)
  */
 router.get('/donations/stats', verifyAuth, requireRoles('admin'), getAdminDonationStats);
 router.get('/donations', verifyAuth, requireRoles('admin'), getAdminDonations);
+
+/**
+ * Admin Fund Allocation Endpoints under /api/admin/funds
+ */
+router.get('/funds/summary', verifyAuth, requireRoles('admin'), getAdminFundsSummary);
+router.get('/funds/allocations', verifyAuth, requireRoles('admin'), getAdminAllocations);
+router.post('/funds/allocations', verifyAuth, requireRoles('admin'), createFundAllocation);
+router.get('/funds/cases/:caseId', verifyAuth, requireRoles('admin'), getAdminCaseFinancials);
 
 export default router;

@@ -14,6 +14,7 @@ import DonatePage from './pages/DonatePage';
 import DonationReceiptPage from './pages/donor/DonationReceiptPage';
 import DonorDonationsPage from './pages/donor/DonorDonationsPage';
 import AdminDonationsPage from './pages/admin/AdminDonationsPage';
+import AdminFundsPage from './pages/admin/AdminFundsPage';
 
 // Dashboards
 import DonorDashboard from './pages/dashboards/DonorDashboard';
@@ -160,6 +161,18 @@ export function App() {
                 <ProtectedRoute>
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <AdminDonationsPage />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Fund Allocation Dashboard */}
+            <Route
+              path="admin/funds"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminFundsPage />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

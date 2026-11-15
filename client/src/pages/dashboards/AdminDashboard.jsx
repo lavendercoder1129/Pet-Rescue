@@ -69,15 +69,20 @@ export const AdminDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link to="/admin/funds">
+              <PrimaryButton size="sm">
+                Fund Allocations
+              </PrimaryButton>
+            </Link>
             <Link to="/admin/donations">
               <OutlineButton size="sm">
-                Donations Overview
+                Donations
               </OutlineButton>
             </Link>
             <Link to="/admin/cases">
-              <PrimaryButton size="sm" icon={ClipboardCheck}>
-                Review Emergency Cases
-              </PrimaryButton>
+              <OutlineButton size="sm" icon={ClipboardCheck}>
+                Review Cases
+              </OutlineButton>
             </Link>
             <OutlineButton size="sm" icon={RefreshCw} onClick={fetchAdminData}>
               Refresh Data

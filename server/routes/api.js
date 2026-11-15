@@ -5,6 +5,7 @@ import adminRoutes from './adminRoutes.js';
 import caseRoutes from './caseRoutes.js';
 import notificationRoutes from './notificationRoutes.js';
 import donationRoutes from './donationRoutes.js';
+import transparencyRoutes from './transparencyRoutes.js';
 
 const router = express.Router();
 
@@ -25,6 +26,9 @@ router.use('/admin', adminRoutes);
 
 // Notification endpoints (/api/notifications)
 router.use('/notifications', notificationRoutes);
+
+// Transparency endpoints (/api/transparency)
+router.use('/transparency', transparencyRoutes);
 
 // Base route for API documentation / ping
 router.get('/', (req, res) => {

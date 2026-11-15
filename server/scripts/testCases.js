@@ -56,7 +56,22 @@ const runCaseTests = async () => {
     }
   };
 
-  // 1. Get tokens for Admin, Approved Rescuer, Pending Rescuer, and Donor
+  // 1. Ensure Admin exists
+  let adminCheck = await User.findOne({ email: 'admin@petrescue.example' });
+  if (!adminCheck) {
+    const passwordHash = await User.hashPassword(process.env.ADMIN_PASSWORD || 'AdminPass2026!');
+    adminCheck = await User.create({
+      name: 'System Administrator',
+      email: 'admin@petrescue.example',
+      phone: '+91 98000 00000',
+      passwordHash,
+      role: 'admin',
+      rescuerVerificationStatus: 'not_applicable',
+      isActive: true,
+    });
+  }
+
+  // Get tokens for Admin, Approved Rescuer, Pending Rescuer, and Donor
   const adminLog = await post('/auth/login', {
     email: 'admin@petrescue.example',
     password: process.env.ADMIN_PASSWORD || 'AdminPass2026!',
@@ -65,6 +80,21 @@ const runCaseTests = async () => {
 
   // Ensure an approved rescuer and a pending rescuer
   let appRescuer = await User.findOne({ email: 'seed_rescuer@petrescue.example' });
+  if (!appRescuer) {
+    const passwordHash = await User.hashPassword('RescuerPass2026!');
+    appRescuer = await User.create({
+      name: 'Priya Sundaram (Lead Rescuer)',
+      email: 'seed_rescuer@petrescue.example',
+      phone: '+91 98450 12345',
+      passwordHash,
+      role: 'rescuer',
+      rescuerVerificationStatus: 'approved',
+      isActive: true,
+    });
+  } else if (appRescuer.rescuerVerificationStatus !== 'approved') {
+    appRescuer.rescuerVerificationStatus = 'approved';
+    await appRescuer.save();
+  }
   const appLog = await post('/auth/login', {
     email: 'seed_rescuer@petrescue.example',
     password: 'RescuerPass2026!',

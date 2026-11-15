@@ -39,6 +39,7 @@ jobs:
           JWT_SECRET: ci_secret_key_testing_jwt_token_32_chars
         run: |
           node scripts/createAdmin.js || true
+          node scripts/seedCases.js || true
           node scripts/seedAchievements.js || true
 
       - name: Start Backend Server

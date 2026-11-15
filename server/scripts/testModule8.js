@@ -78,6 +78,19 @@ const runModule8Tests = async () => {
   // 1. Setup Accounts
   console.log('\n--- 1. Setting up accounts ---');
   // Admin
+  let adminCheck = await User.findOne({ email: 'admin@petrescue.example' });
+  if (!adminCheck) {
+    const passwordHash = await User.hashPassword(process.env.ADMIN_PASSWORD || 'AdminPass2026!');
+    adminCheck = await User.create({
+      name: 'System Administrator',
+      email: 'admin@petrescue.example',
+      phone: '+91 98000 00000',
+      passwordHash,
+      role: 'admin',
+      rescuerVerificationStatus: 'not_applicable',
+      isActive: true,
+    });
+  }
   const adminLog = await postJSON('/auth/login', {
     email: 'admin@petrescue.example',
     password: process.env.ADMIN_PASSWORD || 'AdminPass2026!',

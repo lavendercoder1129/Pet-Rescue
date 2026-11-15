@@ -53,7 +53,19 @@ const runModule11Tests = async () => {
   try {
     // 1. Setup accounts
     console.log('\n--- 1. Setting up Test Accounts ---');
-    const adminUser = await User.findOne({ role: 'admin' });
+    let adminUser = await User.findOne({ role: 'admin' });
+    if (!adminUser) {
+      const passwordHash = await User.hashPassword(process.env.ADMIN_PASSWORD || 'AdminPass2026!');
+      adminUser = await User.create({
+        name: 'System Administrator',
+        email: 'admin@petrescue.example',
+        phone: '+91 98000 00000',
+        passwordHash,
+        role: 'admin',
+        rescuerVerificationStatus: 'not_applicable',
+        isActive: true,
+      });
+    }
     const adminLogin = await postJSON('/auth/login', {
       email: adminUser.email,
       password: process.env.ADMIN_PASSWORD || 'AdminPass2026!',

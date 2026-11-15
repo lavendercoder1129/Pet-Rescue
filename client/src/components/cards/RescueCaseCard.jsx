@@ -1,10 +1,15 @@
-import { MapPin, Heart } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { MapPin, Heart, Eye } from 'lucide-react';
 import UrgencyBadge from '../feedback/UrgencyBadge';
 import ProgressBar from '../feedback/ProgressBar';
 import PrimaryButton from '../common/PrimaryButton';
+import OutlineButton from '../common/OutlineButton';
 
 export const RescueCaseCard = ({
+  id,
   image,
+  fallbackImage,
   title,
   animalType = 'Dog',
   location,
@@ -14,9 +19,19 @@ export const RescueCaseCard = ({
   targetAmount = 1000,
   donorCount = 0,
   onDonate,
+  onViewCase,
+  caseUrl,
   className = '',
 }) => {
+  const [imgSrc, setImgSrc] = useState(image);
   const percentage = Math.round((currentAmount / (targetAmount || 1)) * 100);
+  const detailUrl = caseUrl || (id ? `/cases/${id}` : '/cases');
+
+  const handleImageError = () => {
+    if (fallbackImage && imgSrc !== fallbackImage) {
+      setImgSrc(fallbackImage);
+    }
+  };
 
   return (
     <article
@@ -24,10 +39,11 @@ export const RescueCaseCard = ({
     >
       {/* Visual Image container with Urgency Overlay */}
       <div className="relative aspect-[16/10] bg-ivory-warm overflow-hidden">
-        {image ? (
+        {imgSrc ? (
           <img
-            src={image}
+            src={imgSrc}
             alt={`Injured ${animalType} - ${title}`}
+            onError={handleImageError}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             loading="lazy"
           />
@@ -58,9 +74,11 @@ export const RescueCaseCard = ({
             </div>
           )}
 
-          <h3 className="font-serif text-xl font-bold text-forest leading-snug group-hover:text-forest-light transition-colors">
-            {title}
-          </h3>
+          <Link to={detailUrl} className="block group-hover:text-forest-light transition-colors">
+            <h3 className="font-serif text-xl font-bold text-forest leading-snug">
+              {title}
+            </h3>
+          </Link>
 
           <p className="text-sm text-charcoal-muted line-clamp-2 leading-relaxed">
             {injuryDescription}
@@ -86,16 +104,38 @@ export const RescueCaseCard = ({
             size="sm"
           />
 
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-xs text-charcoal-muted">
-              {donorCount} simulated supporters
-            </span>
+          <div className="text-xs text-charcoal-muted">
+            {donorCount} simulated supporters
+          </div>
+
+          {/* Action buttons: View Case & Support This Rescue */}
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            {onViewCase ? (
+              <OutlineButton
+                size="sm"
+                icon={Eye}
+                onClick={onViewCase}
+                className="w-full text-xs"
+              >
+                View Case
+              </OutlineButton>
+            ) : (
+              <Link to={detailUrl} className="w-full">
+                <OutlineButton
+                  size="sm"
+                  icon={Eye}
+                  className="w-full text-xs"
+                >
+                  View Case
+                </OutlineButton>
+              </Link>
+            )}
 
             <PrimaryButton
               size="sm"
               icon={Heart}
               onClick={onDonate}
-              className="bg-orange-muted hover:bg-orange-hover text-white shadow-none"
+              className="w-full text-xs bg-orange-muted hover:bg-orange-hover text-white shadow-none"
             >
               Support Case
             </PrimaryButton>

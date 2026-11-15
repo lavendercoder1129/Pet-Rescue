@@ -6,8 +6,11 @@ import {
   getMyCases,
   getAdminCases,
   getAdminCaseById,
+  getAdminCaseStats,
+  getCaseAuditHistory,
   approveCase,
   rejectCase,
+  resubmitRescueCase,
 } from '../controllers/caseController.js';
 import { verifyAuth } from '../middleware/authMiddleware.js';
 import { requireRoles } from '../middleware/roleMiddleware.js';
@@ -29,9 +32,20 @@ router.post(
   createRescueCase
 );
 
-// Admin Case Verification Routes
+// Rescuer resubmission for rejected cases
+router.patch(
+  '/:id/resubmit',
+  verifyAuth,
+  requireRoles('rescuer', 'admin'),
+  uploadCaseImages.array('images', 5),
+  resubmitRescueCase
+);
+
+// Admin Case Verification Routes (Both /admin/all and /admin/cases compatible)
+router.get('/admin/stats', verifyAuth, requireRoles('admin'), getAdminCaseStats);
 router.get('/admin/all', verifyAuth, requireRoles('admin'), getAdminCases);
 router.get('/admin/:id', verifyAuth, requireRoles('admin'), getAdminCaseById);
+router.get('/admin/:id/history', verifyAuth, requireRoles('admin'), getCaseAuditHistory);
 router.patch('/admin/:id/approve', verifyAuth, requireRoles('admin'), approveCase);
 router.patch('/admin/:id/reject', verifyAuth, requireRoles('admin'), rejectCase);
 

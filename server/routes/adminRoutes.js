@@ -2,6 +2,14 @@ import express from 'express';
 import { verifyAuth } from '../middleware/authMiddleware.js';
 import { requireRoles } from '../middleware/roleMiddleware.js';
 import User from '../models/User.js';
+import {
+  getAdminCases,
+  getAdminCaseStats,
+  getAdminCaseById,
+  getCaseAuditHistory,
+  approveCase,
+  rejectCase,
+} from '../controllers/caseController.js';
 
 const router = express.Router();
 
@@ -81,5 +89,15 @@ router.patch(
     });
   }
 );
+
+/**
+ * Case Verification Admin Endpoints under /api/admin/cases
+ */
+router.get('/cases/stats', verifyAuth, requireRoles('admin'), getAdminCaseStats);
+router.get('/cases', verifyAuth, requireRoles('admin'), getAdminCases);
+router.get('/cases/:id', verifyAuth, requireRoles('admin'), getAdminCaseById);
+router.get('/cases/:id/history', verifyAuth, requireRoles('admin'), getCaseAuditHistory);
+router.patch('/cases/:id/approve', verifyAuth, requireRoles('admin'), approveCase);
+router.patch('/cases/:id/reject', verifyAuth, requireRoles('admin'), rejectCase);
 
 export default router;

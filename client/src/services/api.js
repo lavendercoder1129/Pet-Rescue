@@ -96,26 +96,66 @@ export const getMyCases = async () => {
   return response.data;
 };
 
+export const resubmitRescueCase = async (id, data) => {
+  const isMultipart = data instanceof FormData;
+  const config = isMultipart
+    ? { headers: { 'Content-Type': 'multipart/form-data' } }
+    : {};
+  const response = await api.patch(`/cases/${id}/resubmit`, data, config);
+  return response.data;
+};
+
 /**
  * Admin Case Review Endpoints
  */
+export const getAdminCaseStats = async () => {
+  const response = await api.get('/admin/cases/stats');
+  return response.data;
+};
+
 export const getAdminCases = async (params = {}) => {
-  const response = await api.get('/cases/admin/all', { params });
+  const response = await api.get('/admin/cases', { params });
   return response.data;
 };
 
 export const getAdminCaseById = async (id) => {
-  const response = await api.get(`/cases/admin/${id}`);
+  const response = await api.get(`/admin/cases/${id}`);
+  return response.data;
+};
+
+export const getCaseAuditHistory = async (id) => {
+  const response = await api.get(`/admin/cases/${id}/history`);
   return response.data;
 };
 
 export const approveAdminCase = async (id, reviewNote) => {
-  const response = await api.patch(`/cases/admin/${id}/approve`, { reviewNote });
+  const response = await api.patch(`/admin/cases/${id}/approve`, { reviewNote });
   return response.data;
 };
 
-export const rejectAdminCase = async (id, reviewNote) => {
-  const response = await api.patch(`/cases/admin/${id}/reject`, { reviewNote });
+export const rejectAdminCase = async (id, reviewNote, rejectionReason) => {
+  const response = await api.patch(`/admin/cases/${id}/reject`, {
+    reviewNote,
+    rejectionReason: rejectionReason || reviewNote,
+  });
+  return response.data;
+};
+
+/**
+ * Notifications Endpoints
+ */
+export const getNotifications = async () => {
+  const response = await api.get('/notifications');
+  return response.data;
+};
+
+export const markNotificationRead = async (id) => {
+  const response = await api.patch(`/notifications/${id}/read`);
+  return response.data;
+};
+
+export const markAllNotificationsRead = async () => {
+  const response = await api.patch('/notifications/read-all');
   return response.data;
 };
 

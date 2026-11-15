@@ -3,6 +3,7 @@ import healthRoutes from './health.js';
 import authRoutes from './authRoutes.js';
 import adminRoutes from './adminRoutes.js';
 import caseRoutes from './caseRoutes.js';
+import notificationRoutes from './notificationRoutes.js';
 
 const router = express.Router();
 
@@ -17,6 +18,9 @@ router.use('/cases', caseRoutes);
 
 // Admin endpoints (/api/admin)
 router.use('/admin', adminRoutes);
+
+// Notification endpoints (/api/notifications)
+router.use('/notifications', notificationRoutes);
 
 // Base route for API documentation / ping
 router.get('/', (req, res) => {

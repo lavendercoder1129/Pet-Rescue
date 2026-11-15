@@ -128,6 +128,11 @@ const rescueCaseSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    rejectionReason: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     reviewedAt: {
       type: Date,
       default: null,

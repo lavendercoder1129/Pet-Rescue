@@ -1,4 +1,7 @@
+import mongoose from 'mongoose';
 import RescueCase from '../models/RescueCase.js';
+import AuditLog from '../models/AuditLog.js';
+import Notification from '../models/Notification.js';
 
 /**
  * @route   GET /api/cases
@@ -273,28 +276,122 @@ export const getMyCases = async (req, res, next) => {
 };
 
 /**
+ * @route   GET /api/admin/cases/stats
+ * @desc    Get aggregate verification metrics for admin dashboard
+ * @access  Private (Admin only)
+ */
+export const getAdminCaseStats = async (req, res, next) => {
+  try {
+    const [totalCases, pendingCases, approvedCases, rejectedCases, criticalCases] =
+      await Promise.all([
+        RescueCase.countDocuments(),
+        RescueCase.countDocuments({ verificationStatus: 'Pending' }),
+        RescueCase.countDocuments({ verificationStatus: 'Approved' }),
+        RescueCase.countDocuments({ verificationStatus: 'Rejected' }),
+        RescueCase.countDocuments({ urgencyLevel: 'Critical' }),
+      ]);
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalCases,
+        pendingCases,
+        approvedCases,
+        rejectedCases,
+        criticalCases,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @route   GET /api/admin/cases
- * @desc    Get all submitted rescue cases for administrative review
+ * @desc    Get all submitted rescue cases for administrative review with search, sort, filter, pagination
  * @access  Private (Admin only)
  */
 export const getAdminCases = async (req, res, next) => {
   try {
-    const { status = 'All' } = req.query;
+    const {
+      status = 'All',
+      search = '',
+      sort = 'newest',
+      page = 1,
+      limit = 10,
+    } = req.query;
 
     const filter = {};
     if (status && status !== 'All') {
       filter.verificationStatus = status;
     }
 
-    const cases = await RescueCase.find(filter)
-      .populate('createdBy', 'name email phone rescuerVerificationStatus')
-      .populate('reviewedBy', 'name email')
-      .sort({ createdAt: -1 })
-      .lean();
+    if (search && search.trim()) {
+      const regex = new RegExp(search.trim(), 'i');
+      filter.$or = [
+        { title: regex },
+        { animalName: regex },
+        { location: regex },
+      ];
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sort === 'oldest') {
+      sortOption = { createdAt: 1 };
+    } else if (sort === 'urgency') {
+      // Urgent ordering: Critical, Urgent, Normal
+      sortOption = { urgencyLevel: 1, createdAt: -1 };
+    } else if (sort === 'updated') {
+      sortOption = { updatedAt: -1 };
+    }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 10));
+    const skip = (pageNum - 1) * limitNum;
+
+    // To allow searching by rescuer name, we can check if search matches users or populate
+    let finalFilter = filter;
+    if (search && search.trim()) {
+      // Find rescuer IDs matching name
+      const User = mongoose.model('User');
+      const matchingRescuers = await User.find({
+        name: new RegExp(search.trim(), 'i'),
+      }).select('_id');
+      const rescuerIds = matchingRescuers.map((r) => r._id);
+
+      finalFilter = {
+        ...filter,
+        $or: [
+          ...(filter.$or || []),
+          { createdBy: { $in: rescuerIds } },
+        ],
+      };
+    }
+
+    const [cases, totalCount] = await Promise.all([
+      RescueCase.find(finalFilter)
+        .populate('createdBy', 'name email phone rescuerVerificationStatus')
+        .populate('reviewedBy', 'name email')
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      RescueCase.countDocuments(finalFilter),
+    ]);
+
+    // Critical count specifically for alert banner if needed
+    const criticalCount = await RescueCase.countDocuments({
+      urgencyLevel: 'Critical',
+      verificationStatus: 'Pending',
+    });
 
     res.status(200).json({
       success: true,
       count: cases.length,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limitNum) || 1,
+      currentPage: pageNum,
+      criticalPendingCount: criticalCount,
       cases,
     });
   } catch (error) {
@@ -304,14 +401,14 @@ export const getAdminCases = async (req, res, next) => {
 
 /**
  * @route   GET /api/admin/cases/:id
- * @desc    Get complete administrative information for a case
+ * @desc    Get complete administrative information for a case including previous submissions
  * @access  Private (Admin only)
  */
 export const getAdminCaseById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(404).json({
         success: false,
         message: 'Rescue case not found.',
@@ -319,7 +416,7 @@ export const getAdminCaseById = async (req, res, next) => {
     }
 
     const rescueCase = await RescueCase.findById(id)
-      .populate('createdBy', 'name email phone rescuerVerificationStatus')
+      .populate('createdBy', 'name email phone rescuerVerificationStatus createdAt')
       .populate('reviewedBy', 'name email')
       .lean();
 
@@ -330,9 +427,54 @@ export const getAdminCaseById = async (req, res, next) => {
       });
     }
 
+    // Previous submitted cases by this rescuer
+    let rescuerPreviousCases = [];
+    if (rescueCase.createdBy?._id) {
+      rescuerPreviousCases = await RescueCase.find({
+        createdBy: rescueCase.createdBy._id,
+        _id: { $ne: rescueCase._id },
+      })
+        .select('title animalName verificationStatus campaignStatus urgencyLevel createdAt')
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean();
+    }
+
     res.status(200).json({
       success: true,
       case: rescueCase,
+      rescuerPreviousCases,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route   GET /api/admin/cases/:id/history
+ * @desc    Get audit history trail for a rescue case
+ * @access  Private (Admin only)
+ */
+export const getCaseAuditHistory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rescue case not found.',
+      });
+    }
+
+    const history = await AuditLog.find({ caseId: id })
+      .populate('adminId', 'name email role')
+      .sort({ timestamp: -1 })
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: history.length,
+      history,
     });
   } catch (error) {
     next(error);
@@ -350,6 +492,13 @@ export const approveCase = async (req, res, next) => {
     const { reviewNote } = req.body;
     const adminUser = req.user;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rescue case not found.',
+      });
+    }
+
     const rescueCase = await RescueCase.findById(id);
 
     if (!rescueCase) {
@@ -359,16 +508,44 @@ export const approveCase = async (req, res, next) => {
       });
     }
 
-    // Set to Approved and campaign status to Active
+    // Guard: Prevent repeated decisions without re-review
+    if (rescueCase.verificationStatus === 'Approved') {
+      return res.status(400).json({
+        success: false,
+        message: 'This rescue case has already been approved.',
+      });
+    }
+
+    const previousStatus = rescueCase.verificationStatus;
+    const cleanNote = reviewNote ? String(reviewNote).trim().slice(0, 1000) : '';
+
     rescueCase.verificationStatus = 'Approved';
     rescueCase.campaignStatus = 'Active';
     rescueCase.reviewedBy = adminUser._id;
     rescueCase.reviewedAt = new Date();
-    if (reviewNote) {
-      rescueCase.reviewNote = reviewNote.trim();
-    }
+    rescueCase.reviewNote = cleanNote;
+    rescueCase.rejectionReason = ''; // Clear rejection reason if previously set
 
     await rescueCase.save();
+
+    // Append-only audit log
+    await AuditLog.create({
+      caseId: rescueCase._id,
+      adminId: adminUser._id,
+      action: 'Approved',
+      previousStatus,
+      newStatus: 'Approved',
+      reviewNote: cleanNote,
+      timestamp: new Date(),
+    });
+
+    // In-app notification for the rescuer
+    await Notification.create({
+      recipient: rescueCase.createdBy,
+      title: 'Rescue Case Approved 🎉',
+      message: `Your case "${rescueCase.title}" for ${rescueCase.animalName} has been approved and is now active for crowdfunding.${cleanNote ? ` Admin note: "${cleanNote}"` : ''}`,
+      caseId: rescueCase._id,
+    });
 
     res.status(200).json({
       success: true,
@@ -388,13 +565,22 @@ export const approveCase = async (req, res, next) => {
 export const rejectCase = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { reviewNote } = req.body;
+    const { reviewNote, rejectionReason } = req.body;
     const adminUser = req.user;
 
-    if (!reviewNote || !reviewNote.trim()) {
+    const reason = (rejectionReason || reviewNote || '').trim();
+
+    if (!reason) {
       return res.status(400).json({
         success: false,
-        message: 'A rejection reason / review note is required to reject a rescue case.',
+        message: 'A rejection reason is required to reject a rescue case.',
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rescue case not found.',
       });
     }
 
@@ -407,17 +593,172 @@ export const rejectCase = async (req, res, next) => {
       });
     }
 
+    // Guard: Prevent repeated decisions
+    if (rescueCase.verificationStatus === 'Rejected') {
+      return res.status(400).json({
+        success: false,
+        message: 'This rescue case has already been rejected.',
+      });
+    }
+
+    const previousStatus = rescueCase.verificationStatus;
+    const cleanReason = reason.slice(0, 1000);
+
     rescueCase.verificationStatus = 'Rejected';
     rescueCase.campaignStatus = 'Rejected';
     rescueCase.reviewedBy = adminUser._id;
     rescueCase.reviewedAt = new Date();
-    rescueCase.reviewNote = reviewNote.trim();
+    rescueCase.rejectionReason = cleanReason;
+    rescueCase.reviewNote = cleanReason;
 
     await rescueCase.save();
+
+    // Append-only audit log
+    await AuditLog.create({
+      caseId: rescueCase._id,
+      adminId: adminUser._id,
+      action: 'Rejected',
+      previousStatus,
+      newStatus: 'Rejected',
+      reviewNote: cleanReason,
+      timestamp: new Date(),
+    });
+
+    // In-app notification for the rescuer
+    await Notification.create({
+      recipient: rescueCase.createdBy,
+      title: 'Rescue Case Requires Revision / Rejected ⚠️',
+      message: `Your case "${rescueCase.title}" was not approved. Reason: "${cleanReason}". You can review the feedback in your rescuer portal.`,
+      caseId: rescueCase._id,
+    });
 
     res.status(200).json({
       success: true,
       message: `Rescue case "${rescueCase.title}" has been rejected.`,
+      case: rescueCase,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route   PATCH /api/cases/:id/resubmit
+ * @desc    Resubmit a rejected case after updating fields
+ * @access  Private (Rescuer owner only)
+ */
+export const resubmitRescueCase = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = req.user;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rescue case not found.',
+      });
+    }
+
+    const rescueCase = await RescueCase.findById(id);
+
+    if (!rescueCase) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rescue case not found.',
+      });
+    }
+
+    // Rescuer ownership check
+    if (
+      rescueCase.createdBy.toString() !== user._id.toString() &&
+      user.role !== 'admin'
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: 'You are only authorized to resubmit your own cases.',
+      });
+    }
+
+    if (rescueCase.verificationStatus !== 'Rejected') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only rejected cases can be resubmitted for verification.',
+      });
+    }
+
+    const {
+      title,
+      animalName,
+      animalType,
+      breed,
+      age,
+      gender,
+      location,
+      description,
+      injuryType,
+      injuryDescription,
+      medicalCondition,
+      urgencyLevel,
+      estimatedTreatmentCost,
+      fundraisingGoal,
+    } = req.body;
+
+    if (title) rescueCase.title = title.trim();
+    if (animalName) rescueCase.animalName = animalName.trim();
+    if (animalType) rescueCase.animalType = animalType;
+    if (breed !== undefined) rescueCase.breed = breed.trim();
+    if (age !== undefined) rescueCase.age = age.trim();
+    if (gender) rescueCase.gender = gender;
+    if (location) rescueCase.location = location.trim();
+    if (description) rescueCase.description = description.trim();
+    if (injuryType) rescueCase.injuryType = injuryType.trim();
+    if (injuryDescription) rescueCase.injuryDescription = injuryDescription.trim();
+    if (medicalCondition) rescueCase.medicalCondition = medicalCondition.trim();
+    if (urgencyLevel) rescueCase.urgencyLevel = urgencyLevel;
+
+    if (estimatedTreatmentCost) {
+      const costNum = Number(estimatedTreatmentCost);
+      if (!isNaN(costNum) && costNum >= 100) {
+        rescueCase.estimatedTreatmentCost = costNum;
+      }
+    }
+
+    if (fundraisingGoal) {
+      const goalNum = Number(fundraisingGoal);
+      if (!isNaN(goalNum) && goalNum >= 100) {
+        rescueCase.fundraisingGoal = goalNum;
+      }
+    }
+
+    // Handle new uploaded images if supplied
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map((file) => `/uploads/cases/${file.filename}`);
+      rescueCase.images = [...rescueCase.images, ...newImages];
+    } else if (req.body.imageUrls && Array.isArray(req.body.imageUrls)) {
+      rescueCase.images = [...rescueCase.images, ...req.body.imageUrls];
+    }
+
+    // Reset status to Pending; keep previous review note in audit log
+    const previousStatus = rescueCase.verificationStatus;
+    rescueCase.verificationStatus = 'Pending';
+    rescueCase.campaignStatus = 'Pending';
+
+    await rescueCase.save();
+
+    // Record in Audit Trail
+    await AuditLog.create({
+      caseId: rescueCase._id,
+      adminId: user._id, // User who triggered the resubmission action
+      action: 'Resubmitted',
+      previousStatus,
+      newStatus: 'Pending',
+      reviewNote: 'Rescuer updated case details and resubmitted for admin review.',
+      timestamp: new Date(),
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Rescue case updated and resubmitted to admin verification queue.',
       case: rescueCase,
     });
   } catch (error) {
